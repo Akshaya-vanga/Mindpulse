@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Games | MindPulse</title>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+  }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 900px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #e0e0ff;
+    margin-bottom: 30px;
+    font-size: 15px;
+  }
+
+  /* ---------- Game Menu ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.95);
+    border-radius: 16px;
+    padding: 25px 20px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-8px);
+  }
+
+  .card h3 {
+    margin-bottom: 10px;
+    color: #333;
+  }
+
+  .card p {
+    font-size: 14px;
+    color: #555;
+  }
+
+  /* ---------- Game Box ---------- */
+  .game-box {
+    background: #fff;
+    border-radius: 18px;
+    padding: 30px;
+    max-width: 500px;
+    margin: 30px auto 0;
+    text-align: center;
+    display: none;
+  }
+
+  .game-box h3 {
+    margin-bottom: 10px;
+  }
+
+  .info {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 15px;
+  }
+
+  input {
+    padding: 10px;
+    width: 80%;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+    margin: 5px;
+  }
+
+  .secondary {
+    background: #ccc;
+    color: #333;
+  }
+
+  .result {
+    margin-top: 15px;
+    font-weight: bold;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>MindPulse Games</h1>
+  <p class="subtitle">
+    These games observe your reaction speed, memory, and quick thinking
+  </p>
+
+  <!-- Menu -->
+  <div class="grid" id="menu">
+
+    <div class="card" onclick="startReaction()">
+      <h3>⚡ Reaction Test</h3>
+      <p>Measure how fast you respond to a signal.</p>
+    </div>
+
+    <div class="card" onclick="startMemory()">
+      <h3>🧠 Memory Challenge</h3>
+      <p>Remember and recall a short number sequence.</p>
+    </div>
+
+    <div class="card" onclick="startMath()">
+      <h3>➕ Quick Math</h3>
+      <p>Solve a simple math problem quickly.</p>
+    </div>
+
+  </div>
+
+  <!-- Reaction Game -->
+  <div class="game-box" id="reactionBox">
+    <h3>Reaction Test</h3>
+    <p class="info" id="reactionInfo">Wait for the signal...</p>
+    <button onclick="reactionClick()">Click</button>
+    <div class="result" id="reactionResult"></div>
+    <button class="secondary" onclick="goBack()">Back</button>
+  </div>
+
+  <!-- Memory Game -->
+  <div class="game-box" id="memoryBox">
+    <h3>Memory Challenge</h3>
+    <p class="info" id="memoryText"></p>
+    <input type="text" id="memoryInput" placeholder="Enter sequence">
+    <button onclick="checkMemory()">Submit</button>
+    <div class="result" id="memoryResult"></div>
+    <button class="secondary" onclick="goBack()">Back</button>
+  </div>
+
+  <!-- Math Game -->
+  <div class="game-box" id="mathBox">
+    <h3>Quick Math</h3>
+    <p class="info" id="mathQ"></p>
+    <input type="number" id="mathAns" placeholder="Your answer">
+    <button onclick="checkMath()">Submit</button>
+    <div class="result" id="mathResult"></div>
+    <button class="secondary" onclick="goBack()">Back</button>
+  </div>
+
+</div>
+
+<script>
+/* ---------- Common ---------- */
+function hideMenu() {
+  document.getElementById("menu").style.display = "none";
+  document.querySelectorAll(".game-box").forEach(b => b.style.display = "none");
+}
+
+function goBack() {
+  document.getElementById("menu").style.display = "grid";
+  document.querySelectorAll(".game-box").forEach(b => b.style.display = "none");
+}
+
+/* ---------- Reaction Test ---------- */
+let reactionStart = 0, canClick = false;
+
+function startReaction() {
+  hideMenu();
+  const box = document.getElementById("reactionBox");
+  box.style.display = "block";
+  document.getElementById("reactionInfo").innerText = "Wait for the signal...";
+  document.getElementById("reactionResult").innerText = "";
+  canClick = false;
+
+  setTimeout(() => {
+    reactionStart = Date.now();
+    document.getElementById("reactionInfo").innerText = "NOW!";
+    canClick = true;
+  }, Math.random() * 3000 + 2000);
+}
+
+function reactionClick() {
+  if (!canClick) return;
+  const time = Date.now() - reactionStart;
+  let msg = time < 300 ? "Excellent reaction speed!" :
+            time < 600 ? "Good reaction speed!" :
+            "Slow reaction, try again.";
+
+  document.getElementById("reactionResult").innerText =
+    `Reaction Time: ${time} ms — ${msg}`;
+  canClick = false;
+}
+
+/* ---------- Memory Game ---------- */
+let memorySeq = "";
+
+function startMemory() {
+  hideMenu();
+  document.getElementById("memoryBox").style.display = "block";
+  document.getElementById("memoryResult").innerText = "";
+  memorySeq = Math.floor(1000 + Math.random() * 9000).toString();
+  document.getElementById("memoryText").innerText = `Remember this number: ${memorySeq}`;
+
+  setTimeout(() => {
+    document.getElementById("memoryText").innerText = "Now type the number";
+  }, 2500);
+}
+
+function checkMemory() {
+  const user = document.getElementById("memoryInput").value;
+  const result = user === memorySeq
+    ? "Correct! Strong short-term memory."
+    : "Incorrect. Try again to improve focus.";
+
+  document.getElementById("memoryResult").innerText = result;
+  document.getElementById("memoryInput").value = "";
+}
+
+/* ---------- Math Game ---------- */
+let mathAnswer = 0;
+
+function startMath() {
+  hideMenu();
+  document.getElementById("mathBox").style.display = "block";
+  document.getElementById("mathResult").innerText = "";
+  const a = Math.floor(Math.random() * 10) + 1;
+  const b = Math.floor(Math.random() * 10) + 1;
+  mathAnswer = a + b;
+  document.getElementById("mathQ").innerText = `What is ${a} + ${b} ?`;
+}
+
+function checkMath() {
+  const user = parseInt(document.getElementById("mathAns").value);
+  const result = user === mathAnswer
+    ? "Correct! Quick thinking."
+    : "Wrong. Slow down and try again.";
+
+  document.getElementById("mathResult").innerText = result;
+  document.getElementById("mathAns").value = "";
+}
+</script>
+
+</body>
+</html>
