@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personality Test | MindPulse</title>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+  }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f7971e, #ffd200);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 540px;
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    animation: fadeIn 0.5s ease;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 8px;
+    color: #333;
+  }
+
+  /* ---------- Disclaimer ---------- */
+  .disclaimer {
+    background: #fff3cd;
+    color: #664d03;
+    border: 1px solid #ffecb5;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12.5px;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .progress, .timer {
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+  }
+
+  .question {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #222;
+  }
+
+  .options label {
+    display: block;
+    padding: 10px;
+    margin-bottom: 8px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .options label:hover {
+    background: #fff8e1;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 14px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #f7971e, #ffd200);
+    color: #333;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="quizCard">
+  <h1>Personality Assessment</h1>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This personality assessment is for educational
+    and self-reflection purposes only. It is not a clinical or psychological diagnosis.
+  </div>
+
+  <div class="progress" id="progress"></div>
+  <div class="timer" id="timer">Time: 0 sec</div>
+
+  <div class="question" id="questionText"></div>
+  <div class="options" id="options"></div>
+
+  <button id="nextBtn" onclick="nextQuestion()" disabled>Next</button>
+</div>
+
+<script>
+/* ================= SCENARIO QUESTIONS (15) ================= */
+const questions = [
+  { q: "You enter a room full of strangers. What do you usually do?",
+    o: ["Start conversations", "Wait for someone to talk", "Observe quietly", "Feel uncomfortable"],
+    w: [3,2,1,0]
+  },
+  { q: "When working in a group, you prefer to:",
+    o: ["Lead the group", "Share ideas equally", "Do assigned tasks", "Work alone"],
+    w: [3,2,1,0]
+  },
+  { q: "How do you recharge after a long day?",
+    o: ["Meeting people", "Talking to close friends", "Watching or reading quietly", "Being completely alone"],
+    w: [3,2,1,0]
+  },
+  { q: "During discussions, you usually:",
+    o: ["Speak confidently", "Speak when needed", "Listen more", "Avoid speaking"],
+    w: [3,2,1,0]
+  },
+  { q: "If plans change suddenly, you:",
+    o: ["Adapt easily", "Adjust with effort", "Feel uneasy", "Get stressed"],
+    w: [3,2,1,0]
+  },
+  { q: "When meeting new people, you feel:",
+    o: ["Excited", "Comfortable", "Nervous", "Anxious"],
+    w: [3,2,1,0]
+  },
+  { q: "In stressful situations, you usually:",
+    o: ["Stay calm", "Manage somehow", "Feel pressured", "Feel overwhelmed"],
+    w: [3,2,1,0]
+  },
+  { q: "How do you usually make decisions?",
+    o: ["Quickly and confidently", "After some thought", "After a lot of thinking", "Avoid deciding"],
+    w: [3,2,1,0]
+  },
+  { q: "When given feedback, you:",
+    o: ["Accept openly", "Think about it", "Feel hurt", "Take it personally"],
+    w: [3,2,1,0]
+  },
+  { q: "At social gatherings, you prefer to:",
+    o: ["Be the center", "Talk to a few people", "Stay quiet", "Leave early"],
+    w: [3,2,1,0]
+  },
+  { q: "When facing challenges, you:",
+    o: ["See them as opportunities", "Try your best", "Feel doubtful", "Avoid them"],
+    w: [3,2,1,0]
+  },
+  { q: "How organized are you?",
+    o: ["Very organized", "Mostly organized", "Somewhat messy", "Very disorganized"],
+    w: [3,2,1,0]
+  },
+  { q: "How do you handle criticism?",
+    o: ["Use it to improve", "Reflect on it", "Feel bad", "Get defensive"],
+    w: [3,2,1,0]
+  },
+  { q: "When alone for long periods, you feel:",
+    o: ["Relaxed", "Okay", "Bored", "Lonely"],
+    w: [3,2,1,0]
+  },
+  { q: "In general, you consider yourself:",
+    o: ["Outgoing", "Balanced", "Reserved", "Very quiet"],
+    w: [3,2,1,0]
+  }
+];
+
+/* ================= VARIABLES ================= */
+let current = 0;
+let personalityScore = 0;
+let selected = null;
+let startTime = Date.now();
+
+/* ================= TIMER ================= */
+setInterval(() => {
+  const sec = Math.floor((Date.now() - startTime) / 1000);
+  document.getElementById("timer").innerText = `Time: ${sec} sec`;
+}, 1000);
+
+/* ================= LOAD QUESTION ================= */
+function loadQuestion() {
+  document.getElementById("progress").innerText =
+    `Question ${current + 1} of ${questions.length}`;
+
+  document.getElementById("questionText").innerText = questions[current].q;
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+  selected = null;
+  document.getElementById("nextBtn").disabled = true;
+
+  questions[current].o.forEach((opt, i) => {
+    const label = document.createElement("label");
+    label.innerHTML = `<input type="radio" name="option"> ${opt}`;
+    label.onclick = () => {
+      selected = i;
+      document.getElementById("nextBtn").disabled = false;
+    };
+    optionsDiv.appendChild(label);
+  });
+
+  document.getElementById("nextBtn").innerText =
+    current === questions.length - 1 ? "Finish" : "Next";
+}
+
+/* ================= NEXT ================= */
+function nextQuestion() {
+  personalityScore += questions[current].w[selected];
+  current++;
+
+  if (current < questions.length) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+}
+
+/* ================= RESULT ================= */
+function showResult() {
+  const totalTime = Math.floor((Date.now() - startTime) / 1000);
+  let type = "";
+
+  if (personalityScore >= 35) type = "🌟 Extroverted Personality";
+  else if (personalityScore >= 25) type = "⚖️ Balanced (Ambivert) Personality";
+  else if (personalityScore >= 15) type = "🌱 Introverted Personality";
+  else type = "🌙 Highly Reserved Personality";
+
+  document.getElementById("quizCard").innerHTML = `
+    <h1>Personality Result</h1>
+    <p><strong>Personality Type:</strong> ${type}</p>
+    <p><strong>Total Time:</strong> ${totalTime} seconds</p>
+    <p>This reflects your typical behavior and preferences in daily situations.</p>
+  `;
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>
