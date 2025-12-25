@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome | MindPulse</title>
+
+  <style>
+    /* ---------- Reset ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    /* ---------- Page Background ---------- */
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Floating background circles */
+    .bg-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: #ffffff;
+      opacity: 0.15;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .circle1 {
+      width: 180px;
+      height: 180px;
+      top: 10%;
+      left: 10%;
+    }
+
+    .circle2 {
+      width: 260px;
+      height: 260px;
+      bottom: 15%;
+      right: 10%;
+      animation-delay: 2s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    /* ---------- Page Wrapper ---------- */
+    .page {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      animation: fadeIn 0.8s ease;
+      z-index: 1;
+    }
+
+    /* ---------- Main Card ---------- */
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 45px 35px;
+      max-width: 440px;
+      width: 90%;
+      border-radius: 18px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      backdrop-filter: blur(8px);
+    }
+
+    /* ---------- Logo Placeholder ---------- */
+    .logo {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .logo span {
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+
+    /* ---------- Icon Row ---------- */
+    .icon-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .icon-row img {
+      width: 52px;
+      height: 52px;
+      transition: transform 0.3s ease;
+    }
+
+    .icon-row img:hover {
+      transform: scale(1.15) rotate(5deg);
+    }
+
+    /* ---------- Text ---------- */
+    h1 {
+      font-size: 30px;
+      margin-bottom: 12px;
+      color: #222;
+    }
+
+    p {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    /* ---------- Button ---------- */
+    button {
+      padding: 14px 30px;
+      font-size: 16px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #ffffff;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(102,126,234,0.4);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(102,126,234,0.5);
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    /* ---------- Page Transitions ---------- */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to   { opacity: 0; }
+    }
+
+    .fade-out {
+      animation: fadeOut 0.4s ease forwards;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background decoration -->
+  <div class="bg-circle circle1"></div>
+  <div class="bg-circle circle2"></div>
+
+  <div class="page" id="page">
+    <div class="card">
+
+      <!-- Logo Placeholder -->
+      <div class="logo">
+        <span>LOGO</span>
+      </div>
+
+      <!-- Icons -->
+      <div class="icon-row">
+        <img src="https://cdn-icons-png.flaticon.com/512/201/201818.png" alt="IQ">
+        <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png" alt="Mood">
+        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920063.png" alt="Personality">
+      </div>
+
+      <h1>Welcome to MindPulse</h1>
+
+      <p>
+        Explore insights about your intelligence, emotional state,
+        and personality through engaging questions and activities.
+      </p>
+
+      <button onclick="goNext()">Start Your Analysis</button>
+
+    </div>
+  </div>
+
+  <script>
+    function goNext() {
+      const page = document.getElementById("page");
+      page.classList.add("fade-out");
+
+      setTimeout(() => {
+        window.location.href = "selection.html";
+      }, 400);
+    }
+  </script>
+
+</body>
+</html>

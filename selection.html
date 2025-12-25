@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select Analysis | MindPulse</title>
+
+  <style>
+    /* ---------- Reset ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ---------- Page ---------- */
+    .page {
+      width: 100%;
+      max-width: 900px;
+      padding: 40px 20px;
+      animation: fadeIn 0.7s ease;
+    }
+
+    h1 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #e0e0ff;
+      margin-bottom: 40px;
+      font-size: 16px;
+    }
+
+    /* ---------- Grid ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+    }
+
+    /* ---------- Card ---------- */
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 30px 20px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.2);
+    }
+
+    .card img {
+      width: 70px;
+      height: 70px;
+      margin-bottom: 15px;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover img {
+      transform: scale(1.1);
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+      color: #333;
+      font-size: 18px;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    /* ---------- Disclaimer Footer ---------- */
+    .disclaimer-footer {
+      width: 100%;
+      text-align: center;
+      padding: 14px 20px 22px;
+      font-size: 13px;
+      color: #f0f0ff;
+      opacity: 0.85;
+    }
+
+    .disclaimer-footer strong {
+      color: #ffffff;
+    }
+
+    /* ---------- Animations ---------- */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page">
+    <h1>Choose Your Analysis</h1>
+    <p class="subtitle">
+      Select an option to begin your personalized assessment
+    </p>
+
+    <div class="grid">
+
+      <div class="card" onclick="goTo('iq.html')">
+        <img src="https://cdn-icons-png.flaticon.com/512/201/201818.png" alt="IQ Test">
+        <h3>Test Your IQ</h3>
+        <p>Measure logical thinking and problem-solving ability.</p>
+      </div>
+
+      <div class="card" onclick="goTo('mood.html')">
+        <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png" alt="Mood Test">
+        <h3>Test Your Mood</h3>
+        <p>Understand your emotional state and stability.</p>
+      </div>
+
+      <div class="card" onclick="goTo('personality.html')">
+        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920063.png" alt="Personality Test">
+        <h3>Test Your Personality</h3>
+        <p>Explore traits and behavioral patterns.</p>
+      </div>
+
+      <div class="card" onclick="goTo('games.html')">
+        <img src="https://cdn-icons-png.flaticon.com/512/1688/1688400.png" alt="Games">
+        <h3>Play Games</h3>
+        <p>Relax and engage with simple interactive games.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Disclaimer Footer -->
+  <footer class="disclaimer-footer">
+    <p>
+      <strong>Disclaimer:</strong>
+      MindPulse analyses are intended for educational and self-reflection purposes only.
+      These assessments are not medically, psychologically, or scientifically validated
+      and should not be considered professional advice.
+    </p>
+  </footer>
+
+  <script>
+    function goTo(page) {
+      window.location.href = page;
+    }
+  </script>
+
+</body>
+</html>
