@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sequence Finder</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+}
+
+#timer {
+  margin: 10px;
+  font-size: 18px;
+}
+
+#game {
+  display: grid;
+  grid-template-columns: repeat(3, 80px);
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.card {
+  width: 80px;
+  height: 80px;
+  background: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.card.open {
+  background: #22c55e;
+  cursor: default;
+}
+
+.card.wrong {
+  background: #ef4444;
+}
+
+#replayBtn {
+  display: none;
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔢 Sequence Finder</h1>
+<div id="timer">⏱ Time: 0 sec</div>
+<p>Find numbers from <b>1 → 9</b> in order</p>
+
+<div id="game"></div>
+
+<button id="replayBtn" onclick="replayGame()">🔁 Replay Again</button>
+
+<script>
+let expected = 1;
+let time = 0;
+let timer;
+let numbers = [];
+let completed = false;
+let lockBoard = false;
+
+function initNumbers() {
+  numbers = [];
+  for (let i = 1; i <= 9; i++) numbers.push(i);
+  numbers.sort(() => Math.random() - 0.5); // shuffle ONLY on replay
+}
+
+function startTimer() {
+  clearInterval(timer);
+  time = 0;
+  document.getElementById("timer").innerText = "⏱ Time: 0 sec";
+  timer = setInterval(() => {
+    time++;
+    document.getElementById("timer").innerText = `⏱ Time: ${time} sec`;
+  }, 1000);
+}
+
+function renderBoard() {
+  const game = document.getElementById("game");
+  game.innerHTML = "";
+
+  numbers.forEach(num => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.value = num;
+    card.innerText = "?";
+    card.onclick = () => handleClick(card);
+    game.appendChild(card);
+  });
+}
+
+function handleClick(card) {
+  if (completed || lockBoard || card.classList.contains("open")) return;
+
+  const value = Number(card.dataset.value);
+  card.innerText = value;
+
+  if (value === expected) {
+    card.classList.add("open");
+    expected++;
+
+    if (expected === 10) {
+      completed = true;
+      clearInterval(timer);
+      document.getElementById("replayBtn").style.display = "inline-block";
+    }
+  } else {
+    // ❌ WRONG CARD — SHOW IT FIRST
+    lockBoard = true;
+    card.classList.add("wrong");
+
+    setTimeout(() => {
+      // flip everything back
+      document.querySelectorAll(".card").forEach(c => {
+        c.classList.remove("open", "wrong");
+        c.innerText = "?";
+      });
+      expected = 1;
+      lockBoard = false;
+    }, 700); // delay like memory flip
+  }
+}
+
+function replayGame() {
+  completed = false;
+  expected = 1;
+  document.getElementById("replayBtn").style.display = "none";
+  initNumbers();   // 🔀 shuffle NOW
+  renderBoard();
+  startTimer();
+}
+
+// INITIAL LOAD
+initNumbers();
+renderBoard();
+startTimer();
+</script>
+
+</body>
+</html>

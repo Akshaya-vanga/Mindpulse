@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Memory Flip Game</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #1e1e2f;
+  color: white;
+  text-align: center;
+}
+
+h1 {
+  margin: 15px 0;
+}
+
+#game {
+  display: grid;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px auto;
+}
+
+.card {
+  width: 60px;
+  height: 60px;
+  background: #444;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.card.flipped,
+.card.matched {
+  background: #4caf50;
+  cursor: default;
+}
+
+button {
+  padding: 10px 18px;
+  margin: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🧠 Memory Flip Game</h1>
+<h2 id="levelText"></h2>
+
+<div id="game"></div>
+
+<div id="controls" style="display:none;">
+  <button onclick="restartLevel()">🔁 Replay Level</button>
+  <button onclick="nextLevel()">➡ Next Level</button>
+</div>
+
+<script>
+let level = 1;
+let firstCard = null;
+let lockBoard = false;
+let matchedCount = 0;
+
+const levels = {
+  1: 4,
+  2: 6,
+  3: 8
+};
+
+function startGame() {
+  const size = levels[level];
+  const totalCards = size * size;
+  const pairs = totalCards / 2;
+
+  document.getElementById("levelText").innerText =
+    `Level ${level} (${size}×${size})`;
+
+  const game = document.getElementById("game");
+  game.innerHTML = "";
+  game.style.gridTemplateColumns = `repeat(${size}, 60px)`;
+
+  matchedCount = 0;
+  firstCard = null;
+  lockBoard = false;
+  document.getElementById("controls").style.display = "none";
+
+  let values = [];
+  for (let i = 1; i <= pairs; i++) {
+    values.push(i);
+    values.push(i);
+  }
+
+  values.sort(() => Math.random() - 0.5); // 🔀 RANDOM SHUFFLE
+
+  values.forEach(value => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.value = value;
+    card.innerText = "?";
+
+    card.onclick = () => flipCard(card);
+    game.appendChild(card);
+  });
+}
+
+function flipCard(card) {
+  if (lockBoard || card.classList.contains("flipped")) return;
+
+  card.classList.add("flipped");
+  card.innerText = card.dataset.value;
+
+  if (!firstCard) {
+    firstCard = card;
+    return;
+  }
+
+  if (firstCard.dataset.value === card.dataset.value) {
+    firstCard.classList.add("matched");
+    card.classList.add("matched");
+    matchedCount += 2;
+    firstCard = null;
+
+    if (matchedCount === document.querySelectorAll(".card").length) {
+      document.getElementById("controls").style.display = "block";
+    }
+  } else {
+    lockBoard = true;
+    setTimeout(() => {
+      firstCard.classList.remove("flipped");
+      card.classList.remove("flipped");
+      firstCard.innerText = "?";
+      card.innerText = "?";
+      firstCard = null;
+      lockBoard = false;
+    }, 700);
+  }
+}
+
+function restartLevel() {
+  startGame(); // 🔁 SAME LEVEL, NEW RANDOM POSITIONS
+}
+
+function nextLevel() {
+  if (level < 3) {
+    level++;
+    startGame();
+  } else {
+    alert("🎉 You completed all levels!");
+    level = 1;
+    startGame();
+  }
+}
+
+startGame();
+</script>
+
+</body>
+</html>
