@@ -12,7 +12,6 @@ body {
   text-align: center;
   min-height: 100vh;
   margin: 0;
-
   background: linear-gradient(
     -45deg,
     #0f2027,
@@ -31,9 +30,7 @@ body {
   100% { background-position: 0% 50%; }
 }
 
-h1 {
-  margin-top: 20px;
-}
+h1 { margin-top: 20px; }
 
 /* 🧊 Glass Board */
 #game {
@@ -43,7 +40,6 @@ h1 {
   justify-content: center;
   margin: 25px auto;
   padding: 25px;
-
   background: rgba(255,255,255,0.1);
   border-radius: 20px;
   backdrop-filter: blur(12px);
@@ -58,11 +54,9 @@ h1 {
   font-size: 30px;
   border-radius: 16px;
   cursor: pointer;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -79,7 +73,7 @@ h1 {
   background: linear-gradient(145deg, #ef4444, #b91c1c);
 }
 
-/* ❌ Shake animation */
+/* ❌ Shake */
 @keyframes shake {
   0% { transform: translateX(0); }
   25% { transform: translateX(-6px); }
@@ -88,11 +82,9 @@ h1 {
   100% { transform: translateX(0); }
 }
 
-.shake {
-  animation: shake 0.4s;
-}
+.shake { animation: shake 0.4s; }
 
-/* 🎯 Info bar */
+/* Info bar */
 #info {
   display: flex;
   justify-content: center;
@@ -108,7 +100,6 @@ h1 {
   inset: 0;
   background: rgba(0,0,0,0.6);
   backdrop-filter: blur(6px);
-
   align-items: center;
   justify-content: center;
 }
@@ -118,6 +109,7 @@ h1 {
   padding: 30px;
   border-radius: 20px;
   box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+  max-width: 300px;
 }
 
 button {
@@ -136,7 +128,7 @@ button {
 <p style="opacity:0.8;">Memorize • Focus • Recall</p>
 
 <div id="info">
-  <div id="progress">Find: 1 / 9</div>
+  <div id="progress">Memorize...</div>
   <div id="timer">⏱ 0s</div>
 </div>
 
@@ -147,6 +139,7 @@ button {
   <div id="resultBox">
     <h2>🎉 Sequence Completed!</h2>
     <p id="finalTime"></p>
+    <p id="comment"></p>
     <button onclick="replay()">🔁 Play Again</button>
   </div>
 </div>
@@ -160,7 +153,47 @@ let lock = false;
 
 const game = document.getElementById("game");
 
-/* 🔢 INIT */
+/* 😄 FUNNY COMMENTS */
+function getFunnyComment(time) {
+  const comments = {
+    fast: [
+      "🚀 Okay… that was suspiciously fast 😎",
+      "🧠 Brain said ‘speedrun’ and meant it.",
+      "⚡ That was clean. Too clean."
+    ],
+    good: [
+      "😎 Smooth! Brain clearly had a plan.",
+      "☕ Focus level: coffee-powered.",
+      "🎯 Locked in. Nice run."
+    ],
+    okay: [
+      "🙂 Brain warmed up halfway through.",
+      "🎮 Casual mode, but effective.",
+      "🧠 Thinking… but thinking well."
+    ],
+    slow: [
+      "🤔 Brain went like… ‘wait, I know this…’",
+      "🐢 Slow and steady, still valid.",
+      "😅 Brain loading… please wait."
+    ],
+    verySlow: [
+      "😂 Brain took the scenic route.",
+      "🌍 Brain explored the map first.",
+      "🧠 AFK brain came back strong."
+    ]
+  };
+
+  let pool;
+  if (time <= 10) pool = comments.fast;
+  else if (time <= 18) pool = comments.good;
+  else if (time <= 30) pool = comments.okay;
+  else if (time <= 45) pool = comments.slow;
+  else pool = comments.verySlow;
+
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+/* INIT */
 function initGame() {
   numbers = [...Array(9).keys()].map(i => i + 1);
   numbers.sort(() => Math.random() - 0.5);
@@ -176,7 +209,7 @@ function initGame() {
   startMemorizePhase();
 }
 
-/* 👁 Memorize Phase */
+/* Memorize Phase */
 function startMemorizePhase() {
   let count = 3;
   const interval = setInterval(() => {
@@ -189,20 +222,18 @@ function startMemorizePhase() {
       hideAll();
       startTimer();
       lock = false;
-      document.getElementById("progress").innerText =
-        "Find: 1 / 9";
+      document.getElementById("progress").innerText = "Find: 1 / 9";
     }
   }, 1000);
 }
 
-/* 🎨 Render */
-function render(showNumbers) {
+function render(show) {
   game.innerHTML = "";
   numbers.forEach(num => {
     const card = document.createElement("div");
     card.className = "card";
     card.dataset.value = num;
-    card.innerText = showNumbers ? num : "?";
+    card.innerText = show ? num : "?";
     card.onclick = () => handleClick(card);
     game.appendChild(card);
   });
@@ -212,7 +243,6 @@ function hideAll() {
   document.querySelectorAll(".card").forEach(c => c.innerText = "?");
 }
 
-/* ⏱ Timer */
 function startTimer() {
   clearInterval(timer);
   timer = setInterval(() => {
@@ -221,7 +251,6 @@ function startTimer() {
   }, 1000);
 }
 
-/* 👉 Click Logic */
 function handleClick(card) {
   if (lock || card.classList.contains("open")) return;
 
@@ -247,28 +276,27 @@ function handleClick(card) {
       });
       game.classList.remove("shake");
       expected = 1;
-      document.getElementById("progress").innerText =
-        "Find: 1 / 9";
+      document.getElementById("progress").innerText = "Find: 1 / 9";
       lock = false;
     }, 800);
   }
 }
 
-/* 🎉 Finish */
 function finishGame() {
   clearInterval(timer);
   document.getElementById("finalTime").innerText =
     `⏱ Time Taken: ${time} seconds`;
+  document.getElementById("comment").innerText =
+    getFunnyComment(time);
   document.getElementById("overlay").style.display = "flex";
 }
 
-/* 🔁 Replay */
 function replay() {
   document.getElementById("overlay").style.display = "none";
   initGame();
 }
 
-/* ▶ Start */
+/* START */
 initGame();
 </script>
 
