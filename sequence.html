@@ -5,53 +5,126 @@
 <title>Sequence Finder</title>
 
 <style>
+/* 🌈 Animated Background */
 body {
-  font-family: Arial, sans-serif;
-  background: #0f172a;
+  font-family: "Segoe UI", Arial, sans-serif;
   color: white;
   text-align: center;
+  min-height: 100vh;
+  margin: 0;
+
+  background: linear-gradient(
+    -45deg,
+    #0f2027,
+    #203a43,
+    #2c5364,
+    #1e3c72,
+    #2a5298
+  );
+  background-size: 400% 400%;
+  animation: gradientBG 14s ease infinite;
 }
 
-#timer {
-  margin: 10px;
-  font-size: 18px;
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-#game {
-  display: grid;
-  grid-template-columns: repeat(3, 80px);
-  gap: 12px;
-  justify-content: center;
+h1 {
   margin-top: 20px;
 }
 
+/* 🧊 Glass Board */
+#game {
+  display: grid;
+  grid-template-columns: repeat(3, 90px);
+  gap: 15px;
+  justify-content: center;
+  margin: 25px auto;
+  padding: 25px;
+
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+}
+
+/* 🃏 Cards */
 .card {
-  width: 80px;
-  height: 80px;
-  background: #334155;
+  width: 90px;
+  height: 90px;
+  background: linear-gradient(145deg, #334155, #1e293b);
+  font-size: 30px;
+  border-radius: 16px;
+  cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
-  border-radius: 8px;
-  cursor: pointer;
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
 }
 
 .card.open {
-  background: #22c55e;
-  cursor: default;
+  background: linear-gradient(145deg, #22c55e, #16a34a);
 }
 
 .card.wrong {
-  background: #ef4444;
+  background: linear-gradient(145deg, #ef4444, #b91c1c);
 }
 
-#replayBtn {
+/* ❌ Shake animation */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
+  100% { transform: translateX(0); }
+}
+
+.shake {
+  animation: shake 0.4s;
+}
+
+/* 🎯 Info bar */
+#info {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 10px;
+  font-size: 15px;
+}
+
+/* 🎉 Overlay */
+#overlay {
   display: none;
-  margin-top: 20px;
-  padding: 10px 20px;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+
+  align-items: center;
+  justify-content: center;
+}
+
+#resultBox {
+  background: rgba(255,255,255,0.15);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+}
+
+button {
+  padding: 10px 22px;
+  margin-top: 15px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
 }
 </style>
@@ -60,96 +133,143 @@ body {
 <body>
 
 <h1>🔢 Sequence Finder</h1>
-<div id="timer">⏱ Time: 0 sec</div>
-<p>Find numbers from <b>1 → 9</b> in order</p>
+<p style="opacity:0.8;">Memorize • Focus • Recall</p>
+
+<div id="info">
+  <div id="progress">Find: 1 / 9</div>
+  <div id="timer">⏱ 0s</div>
+</div>
 
 <div id="game"></div>
 
-<button id="replayBtn" onclick="replayGame()">🔁 Replay Again</button>
+<!-- 🎉 Result Overlay -->
+<div id="overlay">
+  <div id="resultBox">
+    <h2>🎉 Sequence Completed!</h2>
+    <p id="finalTime"></p>
+    <button onclick="replay()">🔁 Play Again</button>
+  </div>
+</div>
 
 <script>
+let numbers = [];
 let expected = 1;
 let time = 0;
 let timer;
-let numbers = [];
-let completed = false;
-let lockBoard = false;
+let lock = false;
 
-function initNumbers() {
-  numbers = [];
-  for (let i = 1; i <= 9; i++) numbers.push(i);
-  numbers.sort(() => Math.random() - 0.5); // shuffle ONLY on replay
+const game = document.getElementById("game");
+
+/* 🔢 INIT */
+function initGame() {
+  numbers = [...Array(9).keys()].map(i => i + 1);
+  numbers.sort(() => Math.random() - 0.5);
+
+  expected = 1;
+  time = 0;
+  lock = true;
+
+  document.getElementById("progress").innerText = "Memorize...";
+  document.getElementById("timer").innerText = "⏱ 0s";
+
+  render(true);
+  startMemorizePhase();
 }
 
-function startTimer() {
-  clearInterval(timer);
-  time = 0;
-  document.getElementById("timer").innerText = "⏱ Time: 0 sec";
-  timer = setInterval(() => {
-    time++;
-    document.getElementById("timer").innerText = `⏱ Time: ${time} sec`;
+/* 👁 Memorize Phase */
+function startMemorizePhase() {
+  let count = 3;
+  const interval = setInterval(() => {
+    document.getElementById("progress").innerText =
+      `Memorize... ${count}`;
+    count--;
+
+    if (count < 0) {
+      clearInterval(interval);
+      hideAll();
+      startTimer();
+      lock = false;
+      document.getElementById("progress").innerText =
+        "Find: 1 / 9";
+    }
   }, 1000);
 }
 
-function renderBoard() {
-  const game = document.getElementById("game");
+/* 🎨 Render */
+function render(showNumbers) {
   game.innerHTML = "";
-
   numbers.forEach(num => {
     const card = document.createElement("div");
     card.className = "card";
     card.dataset.value = num;
-    card.innerText = "?";
+    card.innerText = showNumbers ? num : "?";
     card.onclick = () => handleClick(card);
     game.appendChild(card);
   });
 }
 
+function hideAll() {
+  document.querySelectorAll(".card").forEach(c => c.innerText = "?");
+}
+
+/* ⏱ Timer */
+function startTimer() {
+  clearInterval(timer);
+  timer = setInterval(() => {
+    time++;
+    document.getElementById("timer").innerText = `⏱ ${time}s`;
+  }, 1000);
+}
+
+/* 👉 Click Logic */
 function handleClick(card) {
-  if (completed || lockBoard || card.classList.contains("open")) return;
+  if (lock || card.classList.contains("open")) return;
 
-  const value = Number(card.dataset.value);
-  card.innerText = value;
+  const val = Number(card.dataset.value);
+  card.innerText = val;
 
-  if (value === expected) {
+  if (val === expected) {
     card.classList.add("open");
     expected++;
+    document.getElementById("progress").innerText =
+      `Find: ${expected} / 9`;
 
-    if (expected === 10) {
-      completed = true;
-      clearInterval(timer);
-      document.getElementById("replayBtn").style.display = "inline-block";
-    }
+    if (expected === 10) finishGame();
   } else {
-    // ❌ WRONG CARD — SHOW IT FIRST
-    lockBoard = true;
+    lock = true;
     card.classList.add("wrong");
+    game.classList.add("shake");
 
     setTimeout(() => {
-      // flip everything back
       document.querySelectorAll(".card").forEach(c => {
-        c.classList.remove("open", "wrong");
+        c.className = "card";
         c.innerText = "?";
       });
+      game.classList.remove("shake");
       expected = 1;
-      lockBoard = false;
-    }, 700); // delay like memory flip
+      document.getElementById("progress").innerText =
+        "Find: 1 / 9";
+      lock = false;
+    }, 800);
   }
 }
 
-function replayGame() {
-  completed = false;
-  expected = 1;
-  document.getElementById("replayBtn").style.display = "none";
-  initNumbers();   // 🔀 shuffle NOW
-  renderBoard();
-  startTimer();
+/* 🎉 Finish */
+function finishGame() {
+  clearInterval(timer);
+  document.getElementById("finalTime").innerText =
+    `⏱ Time Taken: ${time} seconds`;
+  document.getElementById("overlay").style.display = "flex";
 }
 
-// INITIAL LOAD
-initNumbers();
-renderBoard();
-startTimer();
+/* 🔁 Replay */
+function replay() {
+  document.getElementById("overlay").style.display = "none";
+  initGame();
+}
+
+/* ▶ Start */
+initGame();
 </script>
 
 </body>
