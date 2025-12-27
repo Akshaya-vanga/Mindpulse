@@ -2,110 +2,94 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Memory Flip Game</title>
+<title>Memory Flip</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* 🌈 Animated Background */
+/* 🌈 Background */
 body {
+  margin: 0;
   font-family: "Segoe UI", Arial, sans-serif;
   color: white;
   text-align: center;
   min-height: 100vh;
-  margin: 0;
-
-  background: linear-gradient(
-    -45deg,
-    #0f2027,
-    #203a43,
-    #2c5364,
-    #1e3c72,
-    #2a5298
-  );
+  background: linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#1e3c72,#2a5298);
   background-size: 400% 400%;
-  animation: gradientBG 14s ease infinite;
+  animation: bg 14s ease infinite;
+}
+@keyframes bg {
+  0% {background-position:0% 50%}
+  50% {background-position:100% 50%}
+  100% {background-position:0% 50%}
 }
 
-@keyframes gradientBG {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
+h1 { margin-top: 20px; }
 
-h1 {
-  margin-top: 20px;
-}
-
-/* 🧊 Glass Board */
+/* 🧊 Board */
 #game {
   display: grid;
   gap: 14px;
   justify-content: center;
-  margin: 25px auto;
   padding: 25px;
-
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
+  margin: 20px auto;
+  background: rgba(255,255,255,0.08);
+  border-radius: 20px;
   backdrop-filter: blur(12px);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+  perspective: 900px;
 }
 
-/* 🃏 Cards */
+/* 🃏 REAL CARD FEEL */
 .card {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(145deg, #334155, #1e293b);
-  font-size: 30px;
+  width: clamp(60px, 18vw, 90px);
+  height: clamp(60px, 18vw, 90px);
+  font-size: clamp(20px, 5vw, 30px);
+  font-weight: 600;
+
+  background: linear-gradient(145deg,#3b4252,#1e293b);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.18);
+
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
+
   cursor: pointer;
 
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    background 0.25s ease;
+  box-shadow:
+    0 6px 12px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+
+  transition: transform .25s, box-shadow .25s, background .25s;
 }
 
 .card:hover {
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  transform: translateY(-6px) scale(1.05);
+  box-shadow:
+    0 14px 28px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.2);
 }
 
 .card.flipped,
 .card.matched {
-  background: linear-gradient(145deg, #22c55e, #16a34a);
-  cursor: default;
+  background: linear-gradient(145deg,#22c55e,#16a34a);
 }
 
-/* 🎯 Buttons */
 button {
   padding: 10px 20px;
   margin: 8px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
 }
 
-/* 🎉 Controls animation */
-@keyframes pop {
-  0% { transform: scale(0.9); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-#controls {
-  animation: pop 0.4s ease;
-}
 </style>
 </head>
 
 <body>
 
 <h1>🧠 Memory Flip</h1>
-<p style="opacity:0.8;font-size:14px;">Focus • Remember • Match</p>
-<h2 id="levelText"></h2>
+<h3 id="levelText"></h3>
 
 <div id="game"></div>
 
@@ -115,111 +99,75 @@ button {
 </div>
 
 <script>
-let level = 1;
-let firstCard = null;
-let lockBoard = false;
-let matched = 0;
+let level = 1, first=null, lock=false, matched=0;
 
-/* 📐 Levels */
 const levels = {
-  1: { rows: 2, cols: 2 },
-  2: { rows: 2, cols: 3 },
-  3: { rows: 4, cols: 4 }
+  1:{r:2,c:2},
+  2:{r:2,c:3},
+  3:{r:4,c:4}
 };
 
-/* 🔢 + 😀 Symbols pool */
 const symbols = [
   "1","2","3","4","5","6","7","8","9",
   "🔥","🎯","⭐","❤️","😎","🐶","🍎","🎵","🚀","⚽"
 ];
 
-function startGame() {
-  const { rows, cols } = levels[level];
-  const totalCards = rows * cols;
-  const pairs = totalCards / 2;
+function startGame(){
+  const {r,c}=levels[level];
+  const pairs=(r*c)/2;
 
-  matched = 0;
-  firstCard = null;
-  lockBoard = false;
+  matched=0; first=null; lock=false;
+  document.getElementById("controls").style.display="none";
+  document.getElementById("levelText").innerText=`Level ${level} (${r}×${c})`;
 
-  document.getElementById("controls").style.display = "none";
-  document.getElementById("levelText").innerText =
-    `Level ${level}`;
+  let pool=[...symbols].sort(()=>Math.random()-0.5);
+  let values=[];
+  for(let i=0;i<pairs;i++) values.push(pool[i],pool[i]);
+  values.sort(()=>Math.random()-0.5);
 
-  // 🔀 SHUFFLE SYMBOLS FIRST (IMPORTANT)
-  let shuffledSymbols = [...symbols].sort(() => Math.random() - 0.5);
+  const game=document.getElementById("game");
+  game.innerHTML="";
+  game.style.gridTemplateColumns=`repeat(${c},1fr)`;
 
-  let values = [];
-  for (let i = 0; i < pairs; i++) {
-    values.push(shuffledSymbols[i], shuffledSymbols[i]);
-  }
-
-  // 🔀 Shuffle card positions
-  values.sort(() => Math.random() - 0.5);
-
-  const game = document.getElementById("game");
-  game.innerHTML = "";
-  game.style.gridTemplateColumns = `repeat(${cols}, 80px)`;
-
-  values.forEach(val => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.dataset.value = val;
-    card.innerText = "?";
-    card.onclick = () => flipCard(card);
+  values.forEach(v=>{
+    const card=document.createElement("div");
+    card.className="card";
+    card.dataset.value=v;
+    card.innerText="?";
+    card.onclick=()=>flip(card);
     game.appendChild(card);
   });
 }
 
-function flipCard(card) {
-  if (lockBoard || card.classList.contains("flipped")) return;
+function flip(card){
+  if(lock||card.classList.contains("flipped")) return;
 
   card.classList.add("flipped");
-  card.innerText = card.dataset.value;
+  card.innerText=card.dataset.value;
 
-  if (!firstCard) {
-    firstCard = card;
-    return;
-  }
+  if(!first){ first=card; return; }
 
-  if (firstCard.dataset.value === card.dataset.value) {
-    firstCard.classList.add("matched");
+  if(first.dataset.value===card.dataset.value){
+    first.classList.add("matched");
     card.classList.add("matched");
-    matched += 2;
-    firstCard = null;
-
-    if (matched === document.querySelectorAll(".card").length) {
-      document.getElementById("controls").style.display = "block";
-    }
+    matched+=2;
+    first=null;
+    if(matched===document.querySelectorAll(".card").length)
+      document.getElementById("controls").style.display="block";
   } else {
-    lockBoard = true;
-    setTimeout(() => {
-      firstCard.classList.remove("flipped");
+    lock=true;
+    setTimeout(()=>{
+      first.classList.remove("flipped");
       card.classList.remove("flipped");
-      firstCard.innerText = "?";
-      card.innerText = "?";
-      firstCard = null;
-      lockBoard = false;
-    }, 700);
+      first.innerText="?"; card.innerText="?";
+      first=null; lock=false;
+    },700);
   }
 }
 
-function restart() {
-  startGame(); // reshuffle + mixed symbols
-}
+function restart(){ startGame(); }
+function nextLevel(){ level=level<3?level+1:1; startGame(); }
 
-function nextLevel() {
-  if (level < 3) {
-    level++;
-    startGame();
-  } else {
-    alert("🎉 All levels completed!");
-    level = 1;
-    startGame();
-  }
-}
-
-/* ▶ Initial Load */
 startGame();
 </script>
 
