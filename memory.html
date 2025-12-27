@@ -5,61 +5,112 @@
 <title>Memory Flip Game</title>
 
 <style>
+/* 🌈 Animated Background */
 body {
-  font-family: Arial, sans-serif;
-  background: #1e1e2f;
+  font-family: "Segoe UI", Arial, sans-serif;
   color: white;
   text-align: center;
+  min-height: 100vh;
+  margin: 0;
+
+  background: linear-gradient(
+    -45deg,
+    #0f2027,
+    #203a43,
+    #2c5364,
+    #1e3c72,
+    #2a5298
+  );
+  background-size: 400% 400%;
+  animation: gradientBG 14s ease infinite;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 h1 {
-  margin: 15px 0;
+  margin-top: 20px;
 }
 
+/* 🧊 Glass Board */
 #game {
   display: grid;
-  gap: 10px;
+  gap: 14px;
   justify-content: center;
-  margin: 20px auto;
+  margin: 25px auto;
+  padding: 25px;
+
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.35);
 }
 
+/* 🃏 Cards */
 .card {
-  width: 60px;
-  height: 60px;
-  background: #444;
-  font-size: 24px;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(145deg, #334155, #1e293b);
+  font-size: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 14px;
   cursor: pointer;
-  border-radius: 8px;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
 }
 
 .card.flipped,
 .card.matched {
-  background: #4caf50;
+  background: linear-gradient(145deg, #22c55e, #16a34a);
   cursor: default;
 }
 
+/* 🎯 Buttons */
 button {
-  padding: 10px 18px;
-  margin: 10px;
+  padding: 10px 20px;
+  margin: 8px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 14px;
+}
+
+/* 🎉 Controls animation */
+@keyframes pop {
+  0% { transform: scale(0.9); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+#controls {
+  animation: pop 0.4s ease;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🧠 Memory Flip Game</h1>
+<h1>🧠 Memory Flip</h1>
+<p style="opacity:0.8;font-size:14px;">Focus • Remember • Match</p>
 <h2 id="levelText"></h2>
 
 <div id="game"></div>
 
 <div id="controls" style="display:none;">
-  <button onclick="restartLevel()">🔁 Replay Level</button>
+  <button onclick="restart()">🔁 Replay</button>
   <button onclick="nextLevel()">➡ Next Level</button>
 </div>
 
@@ -67,45 +118,54 @@ button {
 let level = 1;
 let firstCard = null;
 let lockBoard = false;
-let matchedCount = 0;
+let matched = 0;
 
+/* 📐 Levels */
 const levels = {
-  1: 4,
-  2: 6,
-  3: 8
+  1: { rows: 2, cols: 2 },
+  2: { rows: 2, cols: 3 },
+  3: { rows: 4, cols: 4 }
 };
 
+/* 🔢 + 😀 Symbols pool */
+const symbols = [
+  "1","2","3","4","5","6","7","8","9",
+  "🔥","🎯","⭐","❤️","😎","🐶","🍎","🎵","🚀","⚽"
+];
+
 function startGame() {
-  const size = levels[level];
-  const totalCards = size * size;
+  const { rows, cols } = levels[level];
+  const totalCards = rows * cols;
   const pairs = totalCards / 2;
 
+  matched = 0;
+  firstCard = null;
+  lockBoard = false;
+
+  document.getElementById("controls").style.display = "none";
   document.getElementById("levelText").innerText =
-    `Level ${level} (${size}×${size})`;
+    `Level ${level}`;
+
+  // 🔀 SHUFFLE SYMBOLS FIRST (IMPORTANT)
+  let shuffledSymbols = [...symbols].sort(() => Math.random() - 0.5);
+
+  let values = [];
+  for (let i = 0; i < pairs; i++) {
+    values.push(shuffledSymbols[i], shuffledSymbols[i]);
+  }
+
+  // 🔀 Shuffle card positions
+  values.sort(() => Math.random() - 0.5);
 
   const game = document.getElementById("game");
   game.innerHTML = "";
-  game.style.gridTemplateColumns = `repeat(${size}, 60px)`;
+  game.style.gridTemplateColumns = `repeat(${cols}, 80px)`;
 
-  matchedCount = 0;
-  firstCard = null;
-  lockBoard = false;
-  document.getElementById("controls").style.display = "none";
-
-  let values = [];
-  for (let i = 1; i <= pairs; i++) {
-    values.push(i);
-    values.push(i);
-  }
-
-  values.sort(() => Math.random() - 0.5); // 🔀 RANDOM SHUFFLE
-
-  values.forEach(value => {
+  values.forEach(val => {
     const card = document.createElement("div");
     card.className = "card";
-    card.dataset.value = value;
+    card.dataset.value = val;
     card.innerText = "?";
-
     card.onclick = () => flipCard(card);
     game.appendChild(card);
   });
@@ -125,10 +185,10 @@ function flipCard(card) {
   if (firstCard.dataset.value === card.dataset.value) {
     firstCard.classList.add("matched");
     card.classList.add("matched");
-    matchedCount += 2;
+    matched += 2;
     firstCard = null;
 
-    if (matchedCount === document.querySelectorAll(".card").length) {
+    if (matched === document.querySelectorAll(".card").length) {
       document.getElementById("controls").style.display = "block";
     }
   } else {
@@ -144,8 +204,8 @@ function flipCard(card) {
   }
 }
 
-function restartLevel() {
-  startGame(); // 🔁 SAME LEVEL, NEW RANDOM POSITIONS
+function restart() {
+  startGame(); // reshuffle + mixed symbols
 }
 
 function nextLevel() {
@@ -153,12 +213,13 @@ function nextLevel() {
     level++;
     startGame();
   } else {
-    alert("🎉 You completed all levels!");
+    alert("🎉 All levels completed!");
     level = 1;
     startGame();
   }
 }
 
+/* ▶ Initial Load */
 startGame();
 </script>
 
