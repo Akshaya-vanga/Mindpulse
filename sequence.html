@@ -3,121 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <title>Sequence Finder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* 🌈 Animated Background */
-body {
-  font-family: "Segoe UI", Arial, sans-serif;
-  color: white;
-  text-align: center;
-  min-height: 100vh;
-  margin: 0;
-  background: linear-gradient(
-    -45deg,
-    #0f2027,
-    #203a43,
-    #2c5364,
-    #1e3c72,
-    #2a5298
-  );
-  background-size: 400% 400%;
-  animation: gradientBG 14s ease infinite;
+body{
+  margin:0;
+  font-family:"Segoe UI",Arial;
+  text-align:center;
+  color:white;
+  min-height:100vh;
+  background:linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#1e3c72,#2a5298);
+  background-size:400% 400%;
+  animation:bg 14s ease infinite;
+}
+@keyframes bg{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
 }
 
-@keyframes gradientBG {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+#info{
+  display:flex;
+  justify-content:center;
+  gap:25px;
+  margin-top:10px;
 }
 
-h1 { margin-top: 20px; }
-
-/* 🧊 Glass Board */
-#game {
-  display: grid;
-  grid-template-columns: repeat(3, 90px);
-  gap: 15px;
-  justify-content: center;
-  margin: 25px auto;
-  padding: 25px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 20px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+#game{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+  justify-content:center;
+  padding:25px;
+  margin:25px auto;
+  background:rgba(255,255,255,.08);
+  border-radius:20px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 15px 40px rgba(0,0,0,.4);
+  max-width:360px;
+  perspective:900px;
 }
 
-/* 🃏 Cards */
-.card {
-  width: 90px;
-  height: 90px;
-  background: linear-gradient(145deg, #334155, #1e293b);
-  font-size: 30px;
-  border-radius: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+/* REAL CARD FEEL */
+.card{
+  width:clamp(65px,22vw,95px);
+  height:clamp(65px,22vw,95px);
+  font-size:clamp(22px,6vw,32px);
+  font-weight:600;
+
+  background:linear-gradient(145deg,#3b4252,#1e293b);
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.18);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 6px 12px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.15);
+
+  transition:transform .25s, box-shadow .25s, background .25s;
 }
 
-.card:hover {
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+.card:hover{
+  transform:translateY(-6px) scale(1.05);
 }
 
-.card.open {
-  background: linear-gradient(145deg, #22c55e, #16a34a);
+.card.open{background:linear-gradient(145deg,#22c55e,#16a34a);}
+.card.wrong{background:linear-gradient(145deg,#ef4444,#b91c1c);}
+
+#overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(6px);
+  align-items:center;
+  justify-content:center;
 }
 
-.card.wrong {
-  background: linear-gradient(145deg, #ef4444, #b91c1c);
+#result{
+  background:rgba(255,255,255,.15);
+  padding:30px;
+  border-radius:20px;
 }
 
-/* ❌ Shake */
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-6px); }
-  50% { transform: translateX(6px); }
-  75% { transform: translateX(-6px); }
-  100% { transform: translateX(0); }
-}
-
-.shake { animation: shake 0.4s; }
-
-/* Info bar */
-#info {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  margin-top: 10px;
-  font-size: 15px;
-}
-
-/* 🎉 Overlay */
-#overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(6px);
-  align-items: center;
-  justify-content: center;
-}
-
-#resultBox {
-  background: rgba(255,255,255,0.15);
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-  max-width: 300px;
-}
-
-button {
-  padding: 10px 22px;
-  margin-top: 15px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+button{
+  padding:10px 22px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -125,7 +103,7 @@ button {
 <body>
 
 <h1>🔢 Sequence Finder</h1>
-<p style="opacity:0.8;">Memorize • Focus • Recall</p>
+<p>Memorize • Focus • Recall</p>
 
 <div id="info">
   <div id="progress">Memorize...</div>
@@ -134,170 +112,96 @@ button {
 
 <div id="game"></div>
 
-<!-- 🎉 Result Overlay -->
 <div id="overlay">
-  <div id="resultBox">
-    <h2>🎉 Sequence Completed!</h2>
+  <div id="result">
+    <h2>🎉 Completed!</h2>
     <p id="finalTime"></p>
     <p id="comment"></p>
-    <button onclick="replay()">🔁 Play Again</button>
+    <button onclick="start()">🔁 Play Again</button>
   </div>
 </div>
 
 <script>
-let numbers = [];
-let expected = 1;
-let time = 0;
-let timer;
-let lock = false;
+let nums=[],expected=1,time=0,timer,lock=true;
 
-const game = document.getElementById("game");
-
-/* 😄 FUNNY COMMENTS */
-function getFunnyComment(time) {
-  const comments = {
-    fast: [
-      "🚀 Okay… that was suspiciously fast 😎",
-      "🧠 Brain said ‘speedrun’ and meant it.",
-      "⚡ That was clean. Too clean."
-    ],
-    good: [
-      "😎 Smooth! Brain clearly had a plan.",
-      "☕ Focus level: coffee-powered.",
-      "🎯 Locked in. Nice run."
-    ],
-    okay: [
-      "🙂 Brain warmed up halfway through.",
-      "🎮 Casual mode, but effective.",
-      "🧠 Thinking… but thinking well."
-    ],
-    slow: [
-      "🤔 Brain went like… ‘wait, I know this…’",
-      "🐢 Slow and steady, still valid.",
-      "😅 Brain loading… please wait."
-    ],
-    verySlow: [
-      "😂 Brain took the scenic route.",
-      "🌍 Brain explored the map first.",
-      "🧠 AFK brain came back strong."
-    ]
-  };
-
-  let pool;
-  if (time <= 10) pool = comments.fast;
-  else if (time <= 18) pool = comments.good;
-  else if (time <= 30) pool = comments.okay;
-  else if (time <= 45) pool = comments.slow;
-  else pool = comments.verySlow;
-
-  return pool[Math.floor(Math.random() * pool.length)];
+function comment(t){
+  if(t<=10) return "🚀 Speedrun vibes!";
+  if(t<=18) return "😎 Smooth and focused.";
+  if(t<=30) return "🙂 Brain warmed up nicely.";
+  if(t<=45) return "🤔 Thinking mode activated.";
+  return "😂 Brain took the scenic route.";
 }
 
-/* INIT */
-function initGame() {
-  numbers = [...Array(9).keys()].map(i => i + 1);
-  numbers.sort(() => Math.random() - 0.5);
-
-  expected = 1;
-  time = 0;
-  lock = true;
-
-  document.getElementById("progress").innerText = "Memorize...";
-  document.getElementById("timer").innerText = "⏱ 0s";
-
+function start(){
+  nums=[...Array(9).keys()].map(i=>i+1).sort(()=>Math.random()-0.5);
+  expected=1; time=0; lock=true;
+  document.getElementById("overlay").style.display="none";
+  document.getElementById("progress").innerText="Memorize...";
+  document.getElementById("timer").innerText="⏱ 0s";
   render(true);
-  startMemorizePhase();
+
+  let c=3;
+  const m=setInterval(()=>{
+    document.getElementById("progress").innerText=`Memorize... ${c--}`;
+    if(c<0){clearInterval(m); hide(); startTimer(); lock=false;
+      document.getElementById("progress").innerText="Find: 1 / 9";}
+  },1000);
 }
 
-/* Memorize Phase */
-function startMemorizePhase() {
-  let count = 3;
-  const interval = setInterval(() => {
-    document.getElementById("progress").innerText =
-      `Memorize... ${count}`;
-    count--;
-
-    if (count < 0) {
-      clearInterval(interval);
-      hideAll();
-      startTimer();
-      lock = false;
-      document.getElementById("progress").innerText = "Find: 1 / 9";
-    }
-  }, 1000);
-}
-
-function render(show) {
-  game.innerHTML = "";
-  numbers.forEach(num => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.dataset.value = num;
-    card.innerText = show ? num : "?";
-    card.onclick = () => handleClick(card);
-    game.appendChild(card);
+function render(show){
+  const g=document.getElementById("game");
+  g.innerHTML="";
+  nums.forEach(n=>{
+    const c=document.createElement("div");
+    c.className="card";
+    c.dataset.v=n;
+    c.innerText=show?n:"?";
+    c.onclick=()=>click(c);
+    g.appendChild(c);
   });
 }
 
-function hideAll() {
-  document.querySelectorAll(".card").forEach(c => c.innerText = "?");
+function hide(){
+  document.querySelectorAll(".card").forEach(c=>c.innerText="?");
 }
 
-function startTimer() {
+function startTimer(){
   clearInterval(timer);
-  timer = setInterval(() => {
+  timer=setInterval(()=>{
     time++;
-    document.getElementById("timer").innerText = `⏱ ${time}s`;
-  }, 1000);
+    document.getElementById("timer").innerText=`⏱ ${time}s`;
+  },1000);
 }
 
-function handleClick(card) {
-  if (lock || card.classList.contains("open")) return;
+function click(card){
+  if(lock||card.classList.contains("open")) return;
+  card.innerText=card.dataset.v;
 
-  const val = Number(card.dataset.value);
-  card.innerText = val;
-
-  if (val === expected) {
+  if(+card.dataset.v===expected){
     card.classList.add("open");
     expected++;
-    document.getElementById("progress").innerText =
-      `Find: ${expected} / 9`;
-
-    if (expected === 10) finishGame();
+    document.getElementById("progress").innerText=`Find: ${expected} / 9`;
+    if(expected===10){
+      clearInterval(timer);
+      document.getElementById("finalTime").innerText=`Time: ${time}s`;
+      document.getElementById("comment").innerText=comment(time);
+      document.getElementById("overlay").style.display="flex";
+    }
   } else {
-    lock = true;
+    lock=true;
     card.classList.add("wrong");
-    game.classList.add("shake");
-
-    setTimeout(() => {
-      document.querySelectorAll(".card").forEach(c => {
-        c.className = "card";
-        c.innerText = "?";
+    setTimeout(()=>{
+      document.querySelectorAll(".card").forEach(c=>{
+        c.className="card"; c.innerText="?";
       });
-      game.classList.remove("shake");
-      expected = 1;
-      document.getElementById("progress").innerText = "Find: 1 / 9";
-      lock = false;
-    }, 800);
+      expected=1;
+      document.getElementById("progress").innerText="Find: 1 / 9";
+      lock=false;
+    },800);
   }
 }
 
-function finishGame() {
-  clearInterval(timer);
-  document.getElementById("finalTime").innerText =
-    `⏱ Time Taken: ${time} seconds`;
-  document.getElementById("comment").innerText =
-    getFunnyComment(time);
-  document.getElementById("overlay").style.display = "flex";
-}
-
-function replay() {
-  document.getElementById("overlay").style.display = "none";
-  initGame();
-}
-
-/* START */
-initGame();
+start();
 </script>
 
 </body>
