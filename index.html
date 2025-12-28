@@ -19,43 +19,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
-    }
-
-    .bg-circle {
-      position: absolute;
-      border-radius: 50%;
-      background: #ffffff;
-      opacity: 0.15;
-      animation: float 6s ease-in-out infinite;
-    }
-
-    .circle1 {
-      width: 180px;
-      height: 180px;
-      top: 10%;
-      left: 10%;
-    }
-
-    .circle2 {
-      width: 260px;
-      height: 260px;
-      bottom: 15%;
-      right: 10%;
-      animation-delay: 2s;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
     }
 
     .page {
       width: 100%;
       display: flex;
       justify-content: center;
-      animation: fadeIn 0.8s ease;
-      z-index: 1;
     }
 
     .card {
@@ -66,28 +35,25 @@
       border-radius: 18px;
       text-align: center;
       box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-      backdrop-filter: blur(8px);
     }
 
+    /* ===== LOGO CIRCLE ===== */
     .logo {
-      width: 90px;
-      height: 90px;
-      margin: 0 auto 18px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-      overflow: hidden;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 20px;
     }
 
     .logo img {
-      width: 70%;
-      height: 70%;
-      object-fit: contain;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+
+      /* 🔥 ONLY CIRCULAR PART VISIBLE */
+      clip-path: circle(45% at 50% 50%);
     }
 
+    /* ===== ICONS ===== */
     .icon-row {
       display: flex;
       justify-content: center;
@@ -98,11 +64,6 @@
     .icon-row img {
       width: 52px;
       height: 52px;
-      transition: transform 0.3s ease;
-    }
-
-    .icon-row img:hover {
-      transform: scale(1.15) rotate(5deg);
     }
 
     h1 {
@@ -135,46 +96,28 @@
       box-shadow: 0 12px 24px rgba(102,126,234,0.5);
     }
 
-    button:active {
-      transform: scale(0.97);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-
-    .fade-out {
-      animation: fadeOut 0.4s ease forwards;
-    }
-
     @media (max-width: 480px) {
       h1 { font-size: 26px; }
       p { font-size: 14px; }
-      .icon-row img {
-        width: 46px;
-        height: 46px;
+      .logo {
+        width: 140px;
+        height: 140px;
       }
     }
   </style>
 </head>
+
 <body>
 
-  <div class="bg-circle circle1"></div>
-  <div class="bg-circle circle2"></div>
-
-  <div class="page" id="page">
+  <div class="page">
     <div class="card">
 
+      <!-- LOGO -->
       <div class="logo">
-        <img src="logo.jpeg" alt="MindPulse Logo">
+        <img src="logos.jpeg" alt="MindPulse Logo">
       </div>
 
+      <!-- ICONS -->
       <div class="icon-row">
         <img src="https://cdn-icons-png.flaticon.com/512/201/201818.png" alt="IQ">
         <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png" alt="Mood">
@@ -188,21 +131,12 @@
         and personality through engaging questions and activities.
       </p>
 
-      <button onclick="goNext()">Start Your Analysis</button>
+      <button onclick="window.location.href='selection.html'">
+        Start Your Analysis
+      </button>
 
     </div>
   </div>
-
-  <script>
-    function goNext() {
-      const page = document.getElementById("page");
-      page.classList.add("fade-out");
-
-      setTimeout(() => {
-        window.location.href = "selection.html";
-      }, 400);
-    }
-  </script>
 
 </body>
 </html>
