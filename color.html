@@ -4,234 +4,265 @@
 <meta charset="UTF-8">
 <title>Color Psychology Test | MindPulse</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-body {
+*{
+  box-sizing:border-box;
   font-family: "Segoe UI", sans-serif;
-  background: linear-gradient(to right, #e0f7fa, #fce4ec);
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
 }
-.card {
-  background: white;
-  width: 90%;
-  max-width: 650px;
-  padding: 25px;
-  border-radius: 14px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+
+body{
+  margin:0;
+  min-height:100vh;
+  background: linear-gradient(135deg,#667eea,#764ba2);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:#333;
 }
-h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 12px;
+
+.container{
+  background:#ffffffee;
+  width:95%;
+  max-width:900px;
+  border-radius:18px;
+  padding:25px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.2);
+  animation:fadeIn .6s ease;
 }
-#question {
-  font-size: 18px;
-  text-align: center;
-  color: #444;
-  margin-bottom: 10px;
+
+h1{
+  text-align:center;
+  margin-bottom:10px;
 }
-.options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-top: 15px;
+
+.question{
+  text-align:center;
+  font-size:18px;
+  margin:20px 0;
 }
-.option-img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 12px;
-  cursor: pointer;
-  border: 2px solid #ccc;
-  transition: transform 0.2s, border 0.2s;
+
+.options{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:15px;
 }
-.option-img:hover {
-  transform: scale(1.05);
-  border-color: #888;
+
+.option{
+  border-radius:14px;
+  overflow:hidden;
+  cursor:pointer;
+  border:3px solid transparent;
+  transition:.3s;
+  background:#f9f9f9;
 }
-#progress {
-  text-align: center;
-  margin-top: 15px;
-  color: #666;
+
+.option img{
+  width:100%;
+  height:140px;
+  object-fit:cover;
 }
-#result {
-  display: none;
-  text-align: center;
+
+.option:hover{
+  transform:translateY(-5px);
 }
-#result p {
-  color: #555;
-  font-size: 16px;
-  margin-top: 12px;
+
+.option.selected{
+  border-color:#667eea;
+}
+
+.nav{
+  display:flex;
+  justify-content:space-between;
+  margin-top:20px;
+}
+
+button{
+  padding:10px 22px;
+  border:none;
+  border-radius:10px;
+  background:#667eea;
+  color:#fff;
+  cursor:pointer;
+  font-size:15px;
+}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.result{
+  text-align:center;
+  animation:fadeIn .6s ease;
+}
+
+.result h2{
+  margin-bottom:10px;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
-  <div id="test">
-    <h2>Color Psychology Insight</h2>
-    <div id="question"></div>
-    <div class="options" id="options"></div>
-    <div id="progress"></div>
-  </div>
-
-  <div id="result">
-    <h2>Your Psychological Profile</h2>
-    <p id="colorSummary"></p>
-    <p id="interpretation"></p>
-  </div>
+<div class="container">
+  <h1>Color Psychology Test</h1>
+  <div id="content"></div>
 </div>
 
 <script>
 const questions = [
-  { 
-    text: "Pick the outfit you feel most confident wearing.",
-    options: [
-      { img: "https://cdn.pixabay.com/photo/2023/01/30/00/27/tuxedo-7754404_1280.png", color: "Red" },
-      { img: "https://cdn.pixabay.com/photo/2016/06/29/08/39/wedding-dresses-1486247_1280.jpg", color: "Blue" },
-      { img: "https://cdn.pixabay.com/photo/2016/03/24/09/23/sports-1276395_1280.jpg", color: "Green" },
-      { img: "https://cdn.pixabay.com/photo/2024/02/04/09/45/women-8551837_1280.jpg", color: "Yellow" }
-    ]
-  },
-  { 
-    text: "Which food plate looks the most appealing to you?",
-    options: [
-      { img: "https://cdn.pixabay.com/photo/2021/01/10/04/37/salad-5904093_1280.jpg", color: "Red" },
-      { img: "https://cdn.pixabay.com/photo/2016/12/06/18/27/cheese-1887233_1280.jpg", color: "Blue" },
-      { img: "https://cdn.pixabay.com/photo/2022/02/12/15/00/biryani-7009110_1280.jpg", color: "Green" },
-      { img: "https://cdn.pixabay.com/photo/2021/06/28/14/06/rice-6371739_1280.jpg", color: "Yellow" }
-    ]
-  },
-  { 
-    text: "Which travel scenery appeals to you most?",
-    options: [
-      { img: "https://cdn.pixabay.com/photo/2020/11/12/21/26/fishing-boat-5736839_1280.jpg", color: "Red" },
-      { img: "https://cdn.pixabay.com/photo/2025/08/29/11/16/norway-9803687_1280.jpg", color: "Blue" },
-      { img: "https://cdn.pixabay.com/photo/2020/05/09/22/16/china-5151605_1280.jpg", color: "Green" },
-      { img: "https://cdn.pixabay.com/photo/2019/09/03/13/13/countryside-4449408_1280.jpg", color: "Yellow" }
-    ]
-  },
-  { 
-    text: "Which artistic style speaks to you?",
-    options: [
-      { img: "https://cdn.pixabay.com/photo/2020/10/13/04/30/house-5650706_1280.jpg", color: "Red" },
-      { img: "https://cdn.pixabay.com/photo/2023/12/23/17/15/woman-8466024_1280.jpg", color: "Blue" },
-      { img: "https://cdn.pixabay.com/photo/2021/11/07/02/20/art-6774731_1280.jpg", color: "Green" },
-      { img: "https://cdn.pixabay.com/photo/2021/02/24/20/53/abstract-6047465_1280.jpg", color: "Yellow" }
-    ]
-  },
-  { 
-    text: "Choose a room interior that feels most calming.",
-    options: [
-      { img: "https://cdn.pixabay.com/photo/2017/08/27/10/16/interior-2685521_1280.jpg", color: "Red" },
-      { img: "https://cdn.pixabay.com/photo/2016/08/26/15/06/home-1622401_1280.jpg", color: "Blue" },
-      { img: "https://cdn.pixabay.com/photo/2014/12/27/14/37/living-room-581073_1280.jpg", color: "Green" },
-      { img: "https://cdn.pixabay.com/photo/2019/09/27/11/36/lounge-4508291_1280.jpg", color: "Yellow" }
-    ]
-  },
-  { 
-    text: "Which gadget would you enjoy using most?",
-    options: [
-      { img: "https://cdn.pixabay.com/photo/2014/08/05/10/27/iphone-410311_1280.jpg", color: "Red" },
-      { img: "https://cdn.pixabay.com/photo/2017/04/22/10/44/camera-2251051_1280.jpg", color: "Blue" },
-      { img: "https://cdn.pixabay.com/photo/2019/07/13/10/49/music-4334557_1280.jpg", color: "Green" },
-      { img: "https://cdn.pixabay.com/photo/2015/05/31/10/51/technology-791029_1280.jpg", color: "Yellow" }
-    ]
-  },
-  { 
-    text: "Which garden or nature scene feels most peaceful?",
-    options: [
-      { img: "https://cdn.pixabay.com/photo/2012/08/06/00/53/bridge-53769_1280.jpg", color: "Red" },
-      { img: "https://cdn.pixabay.com/photo/2022/01/06/16/49/bench-6919896_1280.jpg", color: "Blue" },
-      { img: "https://cdn.pixabay.com/photo/2025/03/29/10/59/ryoan-ji-9500830_1280.jpg", color: "Green" },
-      { img: "https://cdn.pixabay.com/photo/2021/11/24/19/49/nature-6821966_1280.jpg", color: "Yellow" }
-    ]
-  },
-  { 
-    text: "Which sky view matches your mood?",
-    options: [
-      { img: "https://cdn.pixabay.com/photo/2018/06/25/00/51/sunrise-3495775_1280.jpg", color: "Red" },
-      { img: "https://cdn.pixabay.com/photo/2019/12/13/19/45/mountains-4693731_1280.jpg", color: "Blue" },
-      { img: "https://cdn.pixabay.com/photo/2019/07/21/18/30/mountain-4353332_1280.jpg", color: "Green" },
-      { img: "https://cdn.pixabay.com/photo/2017/07/31/21/45/sea-2561397_1280.jpg", color: "Yellow" }
-    ]
-  },
-  { 
-    text: "Pick the ambience that feels most like you.",
-    options: [
-      { img: "https://cdn.pixabay.com/photo/2024/12/13/14/45/real-estate-9265386_1280.jpg", color: "Red" },
-      { img: "https://cdn.pixabay.com/photo/2020/03/31/20/17/table-4989118_1280.jpg", color: "Blue" },
-      { img: "https://cdn.pixabay.com/photo/2019/10/15/11/39/music-4551425_1280.jpg", color: "Green" },
-      { img: "https://cdn.pixabay.com/photo/2016/11/30/08/46/living-room-1872191_1280.jpg", color: "Yellow" }
-    ]
-  },
-  { 
-    text: "Choose a house or living space that attracts you most.",
-    options: [
-      { img: "https://cdn.pixabay.com/photo/2018/05/09/23/13/home-3386450_1280.jpg", color: "Red" },
-      { img: "https://cdn.pixabay.com/photo/2016/10/06/17/28/architecture-1719526_1280.jpg", color: "Blue" },
-      { img: "https://cdn.pixabay.com/photo/2019/03/14/10/20/copenhagen-4054563_1280.jpg", color: "Green" },
-      { img: "https://cdn.pixabay.com/photo/2014/07/10/17/18/large-home-389271_1280.jpg", color: "Yellow" }
-    ]
-  }
+{
+ q:"Which outfit feels most like YOU today?",
+ options:[
+  {img:"https://images.pexels.com/photos/6625950/pexels-photo-6625950.jpeg", color:"blue"},
+  {img:"https://images.pexels.com/photos/35228243/pexels-photo-35228243.jpeg", color:"red"},
+  {img:"https://images.pexels.com/photos/9154888/pexels-photo-9154888.jpeg", color:"green"},
+  {img:"https://images.pexels.com/photos/17805849/pexels-photo-17805849.jpeg", color:"yellow"}
+ ]
+},
+{
+ q:"What kind of food attracts you right now?",
+ options:[
+  {img:"https://cdn.pixabay.com/photo/2021/01/10/04/37/salad-5904093_1280.jpg", color:"green"},
+  {img:"https://cdn.pixabay.com/photo/2016/12/06/18/27/cheese-1887233_1280.jpg", color:"yellow"},
+  {img:"https://cdn.pixabay.com/photo/2022/02/12/15/00/biryani-7009110_1280.jpg", color:"red"},
+  {img:"https://cdn.pixabay.com/photo/2021/06/28/14/06/rice-6371739_1280.jpg", color:"blue"}
+ ]
+},
+{
+ q:"Which place feels calming to you?",
+ options:[
+  {img:"https://cdn.pixabay.com/photo/2020/11/12/21/26/fishing-boat-5736839_1280.jpg", color:"blue"},
+  {img:"https://cdn.pixabay.com/photo/2025/08/29/11/16/norway-9803687_1280.jpg", color:"green"},
+  {img:"https://cdn.pixabay.com/photo/2020/05/09/22/16/china-5151605_1280.jpg", color:"red"},
+  {img:"https://cdn.pixabay.com/photo/2019/09/03/13/13/countryside-4449408_1280.jpg", color:"yellow"}
+ ]
+},
+{
+ q:"Which style feels mentally comfortable?",
+ options:[
+  {img:"https://cdn.pixabay.com/photo/2020/10/13/04/30/house-5650706_1280.jpg", color:"blue"},
+  {img:"https://cdn.pixabay.com/photo/2023/12/23/17/15/woman-8466024_1280.jpg", color:"green"},
+  {img:"https://cdn.pixabay.com/photo/2021/11/07/02/20/art-6774731_1280.jpg", color:"yellow"},
+  {img:"https://cdn.pixabay.com/photo/2021/02/24/20/53/abstract-6047465_1280.jpg", color:"red"}
+ ]
+},
+{
+ q:"Choose a home interior you feel safe in",
+ options:[
+  {img:"https://cdn.pixabay.com/photo/2017/08/27/10/16/interior-2685521_1280.jpg", color:"yellow"},
+  {img:"https://cdn.pixabay.com/photo/2016/08/26/15/06/home-1622401_1280.jpg", color:"blue"},
+  {img:"https://cdn.pixabay.com/photo/2014/12/27/14/37/living-room-581073_1280.jpg", color:"green"},
+  {img:"https://cdn.pixabay.com/photo/2019/09/27/11/36/lounge-4508291_1280.jpg", color:"red"}
+ ]
+},
+{
+ q:"What do you feel like engaging with?",
+ options:[
+  {img:"https://cdn.pixabay.com/photo/2014/08/05/10/27/iphone-410311_1280.jpg", color:"red"},
+  {img:"https://cdn.pixabay.com/photo/2017/04/22/10/44/camera-2251051_1280.jpg", color:"yellow"},
+  {img:"https://cdn.pixabay.com/photo/2019/07/13/10/49/music-4334557_1280.jpg", color:"green"},
+  {img:"https://cdn.pixabay.com/photo/2015/05/31/10/51/technology-791029_1280.jpg", color:"blue"}
+ ]
+},
+{
+ q:"Where would you rather sit and think?",
+ options:[
+  {img:"https://cdn.pixabay.com/photo/2012/08/06/00/53/bridge-53769_1280.jpg", color:"blue"},
+  {img:"https://cdn.pixabay.com/photo/2022/01/06/16/49/bench-6919896_1280.jpg", color:"green"},
+  {img:"https://cdn.pixabay.com/photo/2025/03/29/10/59/ryoan-ji-9500830_1280.jpg", color:"yellow"},
+  {img:"https://cdn.pixabay.com/photo/2021/11/24/19/49/nature-6821966_1280.jpg", color:"red"}
+ ]
+},
+{
+ q:"Which view feels emotionally soothing?",
+ options:[
+  {img:"https://cdn.pixabay.com/photo/2018/06/25/00/51/sunrise-3495775_1280.jpg", color:"yellow"},
+  {img:"https://cdn.pixabay.com/photo/2019/12/13/19/45/mountains-4693731_1280.jpg", color:"green"},
+  {img:"https://cdn.pixabay.com/photo/2019/07/21/18/30/mountain-4353332_1280.jpg", color:"blue"},
+  {img:"https://cdn.pixabay.com/photo/2017/07/31/21/45/sea-2561397_1280.jpg", color:"red"}
+ ]
+},
+{
+ q:"What space attracts your mind?",
+ options:[
+  {img:"https://cdn.pixabay.com/photo/2024/12/13/14/45/real-estate-9265386_1280.jpg", color:"blue"},
+  {img:"https://cdn.pixabay.com/photo/2020/03/31/20/17/table-4989118_1280.jpg", color:"yellow"},
+  {img:"https://cdn.pixabay.com/photo/2019/10/15/11/39/music-4551425_1280.jpg", color:"red"},
+  {img:"https://cdn.pixabay.com/photo/2016/11/30/08/46/living-room-1872191_1280.jpg", color:"green"}
+ ]
+},
+{
+ q:"Which house feels mentally peaceful?",
+ options:[
+  {img:"https://cdn.pixabay.com/photo/2018/05/09/23/13/home-3386450_1280.jpg", color:"green"},
+  {img:"https://cdn.pixabay.com/photo/2016/10/06/17/28/architecture-1719526_1280.jpg", color:"blue"},
+  {img:"https://cdn.pixabay.com/photo/2019/03/14/10/20/copenhagen-4054563_1280.jpg", color:"yellow"},
+  {img:"https://cdn.pixabay.com/photo/2014/07/10/17/18/large-home-389271_1280.jpg", color:"red"}
+ ]
+}
 ];
 
-// Shuffle questions and options
-function shuffle(array) {
-  for(let i=array.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [array[i],array[j]]=[array[j],array[i]];
-  }
+let index=0;
+let scores={red:0,blue:0,green:0,yellow:0};
+const content=document.getElementById("content");
+
+// shuffle questions
+questions.sort(()=>Math.random()-0.5);
+
+function render(){
+ const q=questions[index];
+ let html=`<div class="question">${q.q}</div><div class="options">`;
+ q.options.sort(()=>Math.random()-0.5).forEach((o,i)=>{
+  html+=`<div class="option" onclick="select('${o.color}',this)">
+           <img src="${o.img}">
+         </div>`;
+ });
+ html+=`</div>
+ <div class="nav">
+ <button ${index===0?"disabled":""} onclick="prev()">Back</button>
+ <button id="nextBtn" disabled onclick="next()">Next</button>
+ </div>`;
+ content.innerHTML=html;
 }
 
-shuffle(questions);
-questions.forEach(q=>shuffle(q.options));
-
-let index = 0;
-const scores = { Red:0, Blue:0, Green:0, Yellow:0 };
-
-function showQuestion() {
-  const q = questions[index];
-  document.getElementById("question").textContent = q.text;
-  const opts = document.getElementById("options");
-  opts.innerHTML = "";
-  q.options.forEach(o => {
-    const img = document.createElement("img");
-    img.src = o.img;
-    img.className = "option-img";
-    img.onclick = () => choose(o.color);
-    opts.appendChild(img);
-  });
-  document.getElementById("progress").textContent = `Question ${index+1} of ${questions.length}`;
+function select(color,el){
+ document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+ el.classList.add('selected');
+ el.dataset.color=color;
+ document.getElementById("nextBtn").disabled=false;
 }
 
-function choose(c) {
-  scores[c]++;
-  index++;
-  if(index < questions.length) showQuestion();
-  else showResult();
+function next(){
+ const sel=document.querySelector('.option.selected');
+ scores[sel.dataset.color]++;
+ index++;
+ index<questions.length ? render() : showResult();
 }
 
-function showResult() {
-  document.getElementById("test").style.display = "none";
-  document.getElementById("result").style.display = "block";
-  const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
-  const dominant = sorted[0][0];
-  document.getElementById("colorSummary").textContent = `Your dominant color is ${dominant}`;
-  const meanings = {
-    Red: "Energetic, bold, and active.",
-    Blue: "Calm, thoughtful, and introspective.",
-    Green: "Balanced, peaceful, and grounded.",
-    Yellow: "Creative, optimistic, and lively."
-  };
-  document.getElementById("interpretation").textContent = meanings[dominant];
+function prev(){ index--; render(); }
+
+function showResult(){
+ const dominant=Object.keys(scores).reduce((a,b)=>scores[a]>scores[b]?a:b);
+ const map={
+  red:"High energy, driven, possibly stressed but action-oriented.",
+  blue:"Calm, introspective, emotionally balanced.",
+  green:"Emotionally sensitive, healing-oriented, needs peace.",
+  yellow:"Creative, optimistic, mentally curious."
+ };
+ content.innerHTML=`<div class="result">
+ <h2>Your Dominant Color: ${dominant.toUpperCase()}</h2>
+ <p>${map[dominant]}</p>
+ </div>`;
 }
 
-showQuestion();
+render();
 </script>
 
 </body>

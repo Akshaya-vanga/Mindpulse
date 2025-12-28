@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Focus Dot | MindPulse</title>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  font-family:"Segoe UI", sans-serif;
+  background:#0f2027;
+  color:white;
+  overflow:hidden;
+}
+
+h2{
+  text-align:center;
+  margin-top:20px;
+}
+
+#info{
+  text-align:center;
+  opacity:0.85;
+}
+
+#dot{
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  background:#4cafef;
+  position:absolute;
+  display:none;
+  cursor:pointer;
+}
+
+.controls{
+  position:fixed;
+  bottom:20px;
+  width:100%;
+  display:flex;
+  justify-content:center;
+  gap:15px;
+}
+
+button{
+  padding:10px 22px;
+  border:none;
+  border-radius:10px;
+  background:#4cafef;
+  color:white;
+  cursor:pointer;
+  font-size:15px;
+}
+
+#result{
+  text-align:center;
+  margin-top:20px;
+  font-size:16px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🎯 Focus Dot</h2>
+<p id="info">Click the dot as quickly as possible when it appears</p>
+
+<div id="dot"></div>
+
+<div class="controls">
+  <button onclick="startGame()">Start</button>
+  <button onclick="endGame()">End</button>
+</div>
+
+<p id="result"></p>
+
+<script>
+let score = 0;
+let times = [];
+let active = false;
+let startTime;
+const dot = document.getElementById("dot");
+
+function startGame(){
+  score = 0;
+  times = [];
+  active = true;
+  document.getElementById("result").innerText = "";
+  showDot();
+}
+
+function showDot(){
+  if(!active) return;
+
+  const x = Math.random() * (window.innerWidth - 60);
+  const y = Math.random() * (window.innerHeight - 150);
+
+  dot.style.left = x + "px";
+  dot.style.top = y + "px";
+  dot.style.display = "block";
+
+  startTime = Date.now();
+}
+
+dot.onclick = function(){
+  if(!active) return;
+
+  const reaction = (Date.now() - startTime) / 1000;
+  times.push(reaction);
+  score++;
+
+  dot.style.display = "none";
+  setTimeout(showDot, Math.random() * 1200 + 500);
+};
+
+function endGame(){
+  active = false;
+  dot.style.display = "none";
+
+  if(score === 0){
+    document.getElementById("result").innerText =
+      "Game ended. No clicks recorded.";
+    return;
+  }
+
+  const avg =
+    (times.reduce((a,b)=>a+b,0) / times.length).toFixed(2);
+
+  document.getElementById("result").innerText =
+    `Game Over 🧠 | Score: ${score} | Avg Reaction Time: ${avg}s`;
+}
+</script>
+
+</body>
+</html>

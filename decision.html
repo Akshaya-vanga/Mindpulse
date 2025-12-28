@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Decision Speed | MindPulse</title>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  font-family:"Segoe UI", sans-serif;
+  background:#141e30;
+  color:white;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+h2{
+  margin-bottom:5px;
+}
+
+#question{
+  font-size:18px;
+  margin:15px 0;
+}
+
+.options{
+  display:flex;
+  gap:15px;
+}
+
+button{
+  padding:12px 24px;
+  border:none;
+  border-radius:10px;
+  background:#667eea;
+  color:white;
+  cursor:pointer;
+  font-size:15px;
+}
+
+.controls{
+  margin-top:20px;
+}
+
+#result{
+  margin-top:20px;
+  font-size:16px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>⚡ Decision Speed</h2>
+<p>Answer as fast as you can</p>
+
+<p id="question"></p>
+<div class="options"></div>
+
+<div class="controls">
+  <button onclick="stopGame()">End</button>
+</div>
+
+<p id="result"></p>
+
+<script>
+let total = 0;
+let correct = 0;
+let times = [];
+let startTime;
+let active = true;
+
+function generateQuestion(){
+  if(!active) return;
+
+  const type = Math.floor(Math.random()*3);
+  let qText, correctAnswer, options=[];
+
+  if(type === 0){
+    let a = Math.floor(Math.random()*90)+10;
+    let b = Math.floor(Math.random()*90)+10;
+    qText = `Which number is larger?`;
+    options = [a,b];
+    correctAnswer = Math.max(a,b);
+  }
+  else if(type === 1){
+    let a = Math.floor(Math.random()*20)+5;
+    let b = Math.floor(Math.random()*10)+1;
+    qText = `What is ${a} + ${b}?`;
+    correctAnswer = a + b;
+    options = [correctAnswer, correctAnswer+1, correctAnswer-1];
+  }
+  else{
+    let a = Math.floor(Math.random()*10)+1;
+    let b = Math.floor(Math.random()*10)+1;
+    qText = `What is ${a} × ${b}?`;
+    correctAnswer = a * b;
+    options = [correctAnswer, correctAnswer+2, correctAnswer-2];
+  }
+
+  document.getElementById("question").innerText = qText;
+  const ops = document.querySelector(".options");
+  ops.innerHTML = "";
+
+  options.sort(()=>Math.random()-0.5).forEach(val=>{
+    const btn = document.createElement("button");
+    btn.innerText = val;
+    btn.onclick = ()=>answer(val, correctAnswer);
+    ops.appendChild(btn);
+  });
+
+  startTime = Date.now();
+}
+
+function answer(val, correctAnswer){
+  const time = (Date.now() - startTime)/1000;
+  times.push(time);
+  total++;
+  if(val === correctAnswer) correct++;
+
+  generateQuestion();
+}
+
+function stopGame(){
+  active = false;
+  document.querySelector(".options").innerHTML = "";
+  document.getElementById("question").innerText = "";
+
+  if(total === 0){
+    document.getElementById("result").innerText =
+      "Game ended. No responses recorded.";
+    return;
+  }
+
+  const avg =
+    (times.reduce((a,b)=>a+b,0)/times.length).toFixed(2);
+
+  document.getElementById("result").innerText =
+    `Game Over 🧠 | Accuracy: ${correct}/${total} | Avg Time: ${avg}s`;
+}
+
+generateQuestion();
+</script>
+
+</body>
+</html>
