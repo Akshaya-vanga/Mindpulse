@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Color Psychology Test | MindPulse</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: linear-gradient(to right, #e0f7fa, #fce4ec);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .card {
+    background: #ffffff;
+    width: 90%;
+    max-width: 500px;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  }
+
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 15px;
+  }
+
+  #question {
+    font-size: 18px;
+    text-align: center;
+    color: #444;
+    margin-bottom: 25px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #fafafa;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .option-btn:hover {
+    background: #f0f0f0;
+    transform: scale(1.02);
+  }
+
+  .color-box {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1px solid #aaa;
+  }
+
+  .blue { background:#2196f3; }
+  .green { background:#4caf50; }
+  .yellow { background:#fbc02d; }
+  .red { background:#f44336; }
+  .purple { background:#9c27b0; }
+  .orange { background:#ff9800; }
+  .black { background:#212121; }
+  .white { background:#ffffff; }
+
+  #progress {
+    margin-top: 15px;
+    font-size: 14px;
+    text-align: center;
+    color: #666;
+  }
+
+  #result {
+    display: none;
+    text-align: center;
+  }
+
+  #result h3 {
+    margin-bottom: 10px;
+  }
+
+  #result p {
+    font-size: 16px;
+    color: #555;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <div id="test">
+    <h2>Color Psychology Test</h2>
+    <div id="question"></div>
+    <div class="options" id="options"></div>
+    <div id="progress"></div>
+  </div>
+
+  <div id="result">
+    <h3>Your Color Insight</h3>
+    <p id="resultText"></p>
+  </div>
+
+</div>
+
+<script>
+  const colorMeanings = {
+    Blue: "calm and emotional balance",
+    Green: "harmony and stability",
+    Yellow: "optimism and mental energy",
+    Red: "strong emotions and intensity",
+    Purple: "imagination and intuition",
+    Orange: "enthusiasm and social energy",
+    Black: "introspection and control",
+    White: "clarity and simplicity"
+  };
+
+  const questions = [
+    {
+      text: "When you want to relax after a long day, which color feels most suitable?",
+      type: "preference",
+      options: ["Blue", "Green", "White", "Purple"]
+    },
+    {
+      text: "When you feel mentally overwhelmed, which color would you avoid?",
+      type: "avoidance",
+      options: ["Red", "Yellow", "Black", "Orange"]
+    },
+    {
+      text: "If you were designing a calm personal space, which color would you choose?",
+      type: "situational",
+      options: ["Green", "Blue", "White", "Yellow"]
+    },
+    {
+      text: "During emotional stress, which color feels least comforting?",
+      type: "avoidance",
+      options: ["Red", "Black", "Orange", "Purple"]
+    },
+    {
+      text: "Which color best matches your current energy level?",
+      type: "preference",
+      options: ["Red", "Yellow", "Orange", "Blue"]
+    },
+    {
+      text: "For a quiet evening alone, which color feels right?",
+      type: "situational",
+      options: ["Blue", "Purple", "Green", "White"]
+    },
+    {
+      text: "Which color feels mentally heavy for you right now?",
+      type: "avoidance",
+      options: ["Black", "Red", "Purple", "Orange"]
+    },
+    {
+      text: "Which color would help you feel emotionally balanced?",
+      type: "situational",
+      options: ["Green", "Blue", "White", "Purple"]
+    },
+    {
+      text: "Which color do you naturally feel drawn to today?",
+      type: "preference",
+      options: ["Yellow", "Blue", "Green", "Orange"]
+    },
+    {
+      text: "Which color would you avoid when trying to focus?",
+      type: "avoidance",
+      options: ["Red", "Yellow", "Orange", "Black"]
+    },
+    {
+      text: "If today had a color, which would it be?",
+      type: "situational",
+      options: ["Blue", "Yellow", "Purple", "Green"]
+    },
+    {
+      text: "Which color feels emotionally draining to you right now?",
+      type: "avoidance",
+      options: ["Black", "Red", "Orange", "Purple"]
+    },
+    {
+      text: "Which color feels most emotionally safe?",
+      type: "preference",
+      options: ["Blue", "Green", "White", "Purple"]
+    },
+    {
+      text: "In moments of uncertainty, which color would you stay away from?",
+      type: "avoidance",
+      options: ["Red", "Black", "Yellow", "Orange"]
+    },
+    {
+      text: "Which color reflects your inner state today?",
+      type: "situational",
+      options: ["Blue", "Green", "Yellow", "Purple"]
+    }
+  ];
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  const shuffledQuestions = shuffle([...questions]);
+  let index = 0;
+  const scores = {};
+
+  const questionEl = document.getElementById("question");
+  const optionsEl = document.getElementById("options");
+  const progressEl = document.getElementById("progress");
+
+  function showQuestion() {
+    const q = shuffledQuestions[index];
+    questionEl.textContent = q.text;
+    optionsEl.innerHTML = "";
+
+    q.options.forEach(color => {
+      const btn = document.createElement("div");
+      btn.className = "option-btn";
+      btn.innerHTML = `
+        <div class="color-box ${color.toLowerCase()}"></div>
+        ${color}
+      `;
+      btn.onclick = () => selectColor(color, q.type);
+      optionsEl.appendChild(btn);
+    });
+
+    progressEl.textContent = `Question ${index + 1} of ${shuffledQuestions.length}`;
+  }
+
+  function selectColor(color, type) {
+    if (!scores[color]) scores[color] = 0;
+    scores[color] += type === "avoidance" ? 0.5 : 1;
+
+    index++;
+    if (index < shuffledQuestions.length) {
+      showQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    document.getElementById("test").style.display = "none";
+    document.getElementById("result").style.display = "block";
+
+    const dominant = Object.keys(scores).reduce((a, b) =>
+      scores[a] > scores[b] ? a : b
+    );
+
+    document.getElementById("resultText").textContent =
+      `Dominant Color: ${dominant}. This suggests a tendency toward ${colorMeanings[dominant]}.`;
+  }
+
+  showQuestion();
+</script>
+
+</body>
+</html>
