@@ -16,12 +16,11 @@
   body {
     min-height: 100vh;
     background:
-  radial-gradient(circle at 22% 75%, #ffefb8 0%, transparent 45%),
-  radial-gradient(circle at 82% 28%, #dff7e6 0%, transparent 45%),
-  radial-gradient(circle at 18% 32%, #d9e6ff 0%, transparent 45%),
-  radial-gradient(circle at 78% 78%, #ffd1df 0%, transparent 45%),
-  linear-gradient(135deg, #f6f7fb, #e9ecf7);
-
+      radial-gradient(circle at 22% 75%, #ffefb8 0%, transparent 45%),
+      radial-gradient(circle at 82% 28%, #dff7e6 0%, transparent 45%),
+      radial-gradient(circle at 18% 32%, #d9e6ff 0%, transparent 45%),
+      radial-gradient(circle at 78% 78%, #ffd1df 0%, transparent 45%),
+      linear-gradient(135deg, #f6f7fb, #e9ecf7);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -31,7 +30,7 @@
   .card {
     background: #fff;
     width: 100%;
-    max-width: 500px;
+    max-width: 520px;
     border-radius: 18px;
     padding: 30px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.2);
@@ -40,41 +39,37 @@
 
   h1 {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     color: #333;
   }
 
-  .progress {
+  .progress, .timer {
     text-align: center;
     font-size: 14px;
-    color: #666;
+    color: #555;
     margin-bottom: 10px;
   }
 
-  .timer {
-    text-align: center;
-    font-size: 14px;
-    color: #444;
-    margin-bottom: 20px;
-  }
-
   .question {
-    font-size: 16px;
+    font-size: 17px;
     margin-bottom: 15px;
     color: #222;
+    font-weight: 600;
   }
 
   .options label {
     display: block;
-    padding: 10px;
-    margin-bottom: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
+    transition: 0.2s;
   }
 
   .options label:hover {
     background: #f3f3ff;
+    transform: scale(1.02);
   }
 
   button {
@@ -103,7 +98,7 @@
 <body>
 
 <div class="card" id="quizCard">
-  <h1>IQ Test</h1>
+  <h1>IQ Challenge</h1>
   <div class="progress" id="progress"></div>
   <div class="timer" id="timer">Time: 0 sec</div>
 
@@ -116,21 +111,66 @@
 <script>
 /* ================= QUESTIONS ================= */
 const questions = [
-  { q: "2, 4, 8, 16, ?", o: ["32", "24", "18", "20"], a: 0 },
-  { q: "Which word does not belong?", o: ["Dog", "Cat", "Car", "Horse"], a: 2 },
-  { q: "15 × 4 = ?", o: ["45", "60", "75", "55"], a: 1 },
-  { q: "Odd one out:", o: ["64", "81", "100", "121"], a: 2 },
-  { q: "If A=1, Z=?", o: ["24", "25", "26", "27"], a: 2 },
-  { q: "1,1,2,3,5, ?", o: ["6", "7", "8", "9"], a: 2 },
-  { q: "Smallest number?", o: ["0.25", "0.5", "0.4", "1/3"], a: 0 },
-  { q: "3,6,11,18, ?", o: ["25", "27", "29", "24"], a: 1 },
-  { q: "Monday + 10 days?", o: ["Wed", "Thu", "Fri", "Sun"], a: 1 },
-  { q: "Odd word:", o: ["Pen", "Pencil", "Eraser", "Marker"], a: 0 },
-  { q: "144 ÷ 12?", o: ["10", "12", "14", "16"], a: 1 },
-  { q: "Prime number?", o: ["21", "27", "29", "39"], a: 2 },
-  { q: "5x = 20, x?", o: ["3", "4", "5", "6"], a: 1 },
-  { q: "5,10,20,40, ?", o: ["60", "70", "80", "90"], a: 2 },
-  { q: "4 equal sides?", o: ["Rectangle", "Triangle", "Circle", "Square"], a: 3 }
+  {
+    q: "Which one comes next? 🧠  J, F, M, A, M, ?",
+    o: ["J", "A", "S", "O"],
+    a: 0
+  },
+  {
+    q: "A man is looking at a photo. Someone asks, 'Who is it?' He says: 'Brothers and sisters I have none, but that man's father is my father's son.' Who is in the photo?",
+    o: ["His son", "His father", "Himself", "His nephew"],
+    a: 0
+  },
+  {
+    q: "Which shape does NOT belong?",
+    o: ["Circle", "Triangle", "Square", "Cube"],
+    a: 3
+  },
+  {
+    q: "If all Bloops are Razzies and all Razzies are Lazzies, then all Bloops are definitely?",
+    o: ["Lazzies", "Razzies", "Bloops", "None"],
+    a: 0
+  },
+  {
+    q: "Which word is the odd one out?",
+    o: ["Silence", "Noise", "Sound", "Echo"],
+    a: 0
+  },
+  {
+    q: "What can travel around the world while staying in one place?",
+    o: ["Sun", "Moon", "Stamp", "Wind"],
+    a: 2
+  },
+  {
+    q: "Choose the correct mirror image direction of EAST:",
+    o: ["TS A E", "H T S A E", "TSAE", "WEST"],
+    a: 2
+  },
+  {
+    q: "Which number is missing?  1, 4, 9, 16, ?",
+    o: ["20", "25", "24", "36"],
+    a: 1
+  },
+  {
+    q: "If you rearrange the letters 'CIFAIPC', you get the name of a:",
+    o: ["Country", "Ocean", "City", "Animal"],
+    a: 1
+  },
+  {
+    q: "Which one is always coming but never arrives?",
+    o: ["Tomorrow", "Future", "Time", "Train"],
+    a: 0
+  },
+  {
+    q: "Which option completes the pattern? 🔍  ▲ ■ ▲ ■ ▲ ?",
+    o: ["▲", "●", "■", "◆"],
+    a: 2
+  },
+  {
+    q: "What has a head and a tail but no body?",
+    o: ["Snake", "Coin", "Comet", "Bottle"],
+    a: 1
+  }
 ];
 
 /* ================= VARIABLES ================= */
@@ -188,23 +228,20 @@ function nextQuestion() {
 /* ================= RESULT ================= */
 function showResult() {
   const totalTime = Math.floor((Date.now() - startTime) / 1000);
-  let speedMsg = "";
 
-  if (totalTime < 60) speedMsg = "Very fast thinker ⚡";
-  else if (totalTime < 120) speedMsg = "Good speed 👍";
-  else speedMsg = "Takes time to analyze 🧠";
-
-  let scoreMsg = "";
-  if (score <= 5) scoreMsg = "Needs improvement.";
-  else if (score <= 10) scoreMsg = "Good logical skills.";
-  else scoreMsg = "Excellent analytical ability!";
+  let level = "";
+  if (score <= 4) level = "🧩 Curious Thinker";
+  else if (score <= 8) level = "🔥 Sharp Mind";
+  else level = "🧠 High IQ Explorer";
 
   document.getElementById("quizCard").innerHTML = `
     <h1>Your Result</h1>
     <p><strong>Score:</strong> ${score} / ${questions.length}</p>
-    <p><strong>Total Time:</strong> ${totalTime} seconds</p>
-    <p><strong>Speed Analysis:</strong> ${speedMsg}</p>
-    <p><strong>Performance:</strong> ${scoreMsg}</p>
+    <p><strong>Time Taken:</strong> ${totalTime} seconds</p>
+    <p><strong>Mind Type:</strong> ${level}</p>
+    <p style="margin-top:10px; color:#555;">
+      This test measures logic, patterns, and reasoning — not just math.
+    </p>
   `;
 }
 
