@@ -3,76 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <title>Decision Speed | MindPulse</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{
+/* ---------- Reset ---------- */
+*{
   margin:0;
-  height:100vh;
-  font-family:"Segoe UI", sans-serif;
-  background:#141e30;
-  color:white;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Segoe UI", Arial, sans-serif;
+}
+
+/* ---------- Pastel Backdrop ---------- */
+body{
+  min-height:100vh;
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
+  padding:20px;
+
+  background:
+    radial-gradient(circle at 22% 75%, #ffefb8 0%, transparent 45%),
+    radial-gradient(circle at 82% 28%, #dff7e6 0%, transparent 45%),
+    radial-gradient(circle at 18% 32%, #d9e6ff 0%, transparent 45%),
+    radial-gradient(circle at 78% 78%, #ffd1df 0%, transparent 45%),
+    linear-gradient(135deg, #f6f7fb, #e9ecf7);
+
+  color:#2f2f55;
+}
+
+/* ---------- Card Container ---------- */
+.card{
+  width:100%;
+  max-width:520px;
+  background:rgba(255,255,255,.6);
+  backdrop-filter:blur(14px);
+  border-radius:26px;
+  padding:30px;
+  text-align:center;
+
+  box-shadow:0 25px 55px rgba(0,0,0,.18);
+  animation:fade .6s ease;
+}
+
+@keyframes fade{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
 }
 
 h2{
-  margin-bottom:5px;
+  margin-bottom:6px;
 }
 
+.subtitle{
+  opacity:.75;
+  margin-bottom:22px;
+  font-size:14px;
+}
+
+/* ---------- Question ---------- */
 #question{
   font-size:18px;
-  margin:15px 0;
+  margin:18px 0;
 }
 
+/* ---------- Options ---------- */
 .options{
   display:flex;
-  gap:15px;
+  gap:14px;
+  justify-content:center;
+  flex-wrap:wrap;
 }
 
-button{
-  padding:12px 24px;
+.options button{
+  min-width:90px;
+  padding:12px 20px;
   border:none;
-  border-radius:10px;
-  background:#667eea;
-  color:white;
+  border-radius:16px;
+  cursor:pointer;
+
+  background:linear-gradient(145deg,#f8faff,#eef2ff);
+  color:#2f2f55;
+  font-weight:600;
+
+  box-shadow:0 10px 22px rgba(0,0,0,.15);
+  transition:.25s;
+}
+
+.options button:hover{
+  transform:translateY(-5px) scale(1.05);
+  box-shadow:0 18px 35px rgba(0,0,0,.22);
+}
+
+/* ---------- Controls ---------- */
+.controls{
+  margin-top:22px;
+}
+
+.main-btn{
+  padding:12px 28px;
+  border:none;
+  border-radius:24px;
   cursor:pointer;
   font-size:15px;
+
+  background:linear-gradient(135deg,#c17aa1,#ababab);
+  color:white;
 }
 
-.controls{
-  margin-top:20px;
-}
-
+/* ---------- Result ---------- */
 #result{
-  margin-top:20px;
-  font-size:16px;
+  margin-top:18px;
+  font-size:15px;
+  font-weight:500;
+}
+
+/* ---------- Start Screen ---------- */
+#startScreen{
+  text-align:center;
+}
+
+#gameScreen{
+  display:none;
 }
 </style>
 </head>
 
 <body>
 
-<h2>⚡ Decision Speed</h2>
-<p>Answer as fast as you can</p>
+<div class="card">
 
-<p id="question"></p>
-<div class="options"></div>
+  <!-- START SCREEN -->
+  <div id="startScreen">
+    <h2>⚡ Decision Speed</h2>
+<p class="subtitle">
+  This activity is self-paced.<br>
+  Start and end at your convenience.
+</p>
+    <button class="main-btn" onclick="startGame()">▶ Begin Session</button>
+  </div>
 
-<div class="controls">
-  <button onclick="stopGame()">End</button>
+  <!-- GAME SCREEN -->
+  <div id="gameScreen">
+    <h2>⚡ Decision Speed</h2>
+    <p class="subtitle">Answer quickly & trust your instinct</p>
+
+    <p id="question"></p>
+    <div class="options"></div>
+
+    <div class="controls">
+      <button class="main-btn" onclick="stopGame()">⏹ End Session</button>
+    </div>
+
+    <p id="result"></p>
+  </div>
+
 </div>
-
-<p id="result"></p>
 
 <script>
 let total = 0;
 let correct = 0;
 let times = [];
 let startTime;
-let active = true;
+let active = false;
 
+/* ---------- Start ---------- */
+function startGame(){
+  document.getElementById("startScreen").style.display="none";
+  document.getElementById("gameScreen").style.display="block";
+
+  total=0; correct=0; times=[];
+  active=true;
+  document.getElementById("result").innerText="";
+  generateQuestion();
+}
+
+/* ---------- Generate Question ---------- */
 function generateQuestion(){
   if(!active) return;
 
@@ -115,34 +221,32 @@ function generateQuestion(){
   startTime = Date.now();
 }
 
+/* ---------- Answer ---------- */
 function answer(val, correctAnswer){
   const time = (Date.now() - startTime)/1000;
   times.push(time);
   total++;
   if(val === correctAnswer) correct++;
-
   generateQuestion();
 }
 
+/* ---------- Stop ---------- */
 function stopGame(){
-  active = false;
-  document.querySelector(".options").innerHTML = "";
-  document.getElementById("question").innerText = "";
+  active=false;
+  document.querySelector(".options").innerHTML="";
+  document.getElementById("question").innerText="";
 
-  if(total === 0){
+  if(total===0){
     document.getElementById("result").innerText =
-      "Game ended. No responses recorded.";
+      "Session ended. No responses recorded.";
     return;
   }
 
-  const avg =
-    (times.reduce((a,b)=>a+b,0)/times.length).toFixed(2);
+  const avg = (times.reduce((a,b)=>a+b,0)/times.length).toFixed(2);
 
   document.getElementById("result").innerText =
-    `Game Over 🧠 | Accuracy: ${correct}/${total} | Avg Time: ${avg}s`;
+    `🧠 Session Complete | Accuracy: ${correct}/${total} | Avg Time: ${avg}s`;
 }
-
-generateQuestion();
 </script>
 
 </body>

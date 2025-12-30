@@ -2,133 +2,256 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Focus Dot | MindPulse</title>
+<title>Focus Catch | MindPulse</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{
+*{
   margin:0;
-  height:100vh;
-  font-family:"Segoe UI", sans-serif;
-  background:#0f2027;
-  color:white;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Segoe UI", Arial, sans-serif;
+}
+
+/* ---------- Background ---------- */
+body{
+  min-height:100vh;
   overflow:hidden;
+  background:
+    radial-gradient(circle at 22% 75%, #ffefb8 0%, transparent 45%),
+    radial-gradient(circle at 82% 28%, #dff7e6 0%, transparent 45%),
+    radial-gradient(circle at 18% 32%, #d9e6ff 0%, transparent 45%),
+    radial-gradient(circle at 78% 78%, #ffd1df 0%, transparent 45%),
+    linear-gradient(135deg, #f6f7fb, #e9ecf7);
+  color:#2f2f55;
 }
 
-h2{
-  text-align:center;
-  margin-top:20px;
-}
-
-#info{
-  text-align:center;
-  opacity:0.85;
-}
-
-#dot{
-  width:55px;
-  height:55px;
-  border-radius:50%;
-  background:#4cafef;
-  position:absolute;
-  display:none;
-  cursor:pointer;
-}
-
-.controls{
+/* ---------- Intro ---------- */
+#intro{
   position:fixed;
-  bottom:20px;
-  width:100%;
+  inset:0;
   display:flex;
+  align-items:center;
   justify-content:center;
-  gap:15px;
 }
 
-button{
-  padding:10px 22px;
+.intro-card{
+  background:rgba(255,255,255,.65);
+  backdrop-filter:blur(14px);
+  padding:36px;
+  border-radius:28px;
+  text-align:center;
+  width:90%;
+  max-width:480px;
+  box-shadow:0 25px 55px rgba(0,0,0,.18);
+}
+
+.begin-btn{
+  padding:14px 30px;
   border:none;
-  border-radius:10px;
-  background:#4cafef;
-  color:white;
+  border-radius:26px;
   cursor:pointer;
   font-size:15px;
+  background:linear-gradient(135deg,#34d399,#60a5fa);
+  color:white;
+  box-shadow:0 12px 28px rgba(52,211,153,.35);
 }
 
-#result{
+/* ---------- Game UI ---------- */
+#gameUI{ display:none; }
+
+/* ---------- Top Bar ---------- */
+.topbar{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  padding:14px 18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  z-index:10;
+}
+
+#title{
+  font-size:18px;
+  font-weight:600;
+  margin:auto;
+}
+
+.end-btn{
+  padding:10px 18px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  font-size:14px;
+  background:linear-gradient(135deg,#fb7185,#f43f5e);
+  color:white;
+}
+
+/* ---------- Emojis ---------- */
+.emoji{
+  position:absolute;
+  font-size:48px;
+  cursor:pointer;
+  user-select:none;
+  transition:transform .15s, opacity .15s;
+}
+
+.emoji:hover{
+  transform:scale(1.25);
+}
+
+/* ---------- Result Overlay ---------- */
+#overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  backdrop-filter:blur(6px);
+  align-items:center;
+  justify-content:center;
+  z-index:20;
+}
+
+.result-card{
+  background:rgba(255,255,255,.75);
+  backdrop-filter:blur(14px);
+  padding:36px;
+  border-radius:28px;
   text-align:center;
-  margin-top:20px;
-  font-size:16px;
+  width:90%;
+  max-width:420px;
+  box-shadow:0 25px 60px rgba(0,0,0,.25);
 }
 </style>
 </head>
 
 <body>
 
-<h2>🎯 Focus Dot</h2>
-<p id="info">Click the dot as quickly as possible when it appears</p>
-
-<div id="dot"></div>
-
-<div class="controls">
-  <button onclick="startGame()">Start</button>
-  <button onclick="endGame()">End</button>
+<!-- INTRO -->
+<div id="intro">
+  <div class="intro-card">
+    <h2>🎯 Focus Catch</h2>
+    <p style="opacity:.8;margin:16px 0">
+      This activity is self-paced.<br>
+      Start and end at your convenience.
+    </p>
+    <button class="begin-btn" onclick="beginSession()">Begin Session</button>
+  </div>
 </div>
 
-<p id="result"></p>
+<!-- GAME -->
+<div id="gameUI">
+  <div class="topbar">
+    <div></div>
+    <div id="title"></div>
+    <button class="end-btn" onclick="endSession()">End Session</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="overlay">
+  <div class="result-card" id="result"></div>
+</div>
 
 <script>
-let score = 0;
-let times = [];
-let active = false;
+/* ---------- Animals ---------- */
+const animals=[
+  "🐶","🐱","🐭","🐹","🐰",
+  "🦊","🐻","🐼","🐨","🐯",
+  "🦁","🐮","🐷","🐸","🐵"
+];
+
+let target="";
+let score=0;
+let times=[];
 let startTime;
-const dot = document.getElementById("dot");
+let active=false;
 
-function startGame(){
-  score = 0;
-  times = [];
-  active = true;
-  document.getElementById("result").innerText = "";
-  showDot();
+/* ---------- Begin ---------- */
+function beginSession(){
+  document.getElementById("intro").style.display="none";
+  document.getElementById("gameUI").style.display="block";
+
+  target=animals[Math.floor(Math.random()*animals.length)];
+  document.getElementById("title").innerText=
+    `🎯 Find me if you can ${target}`;
+
+  score=0;
+  times=[];
+  active=true;
+  spawnEmojis();
 }
 
-function showDot(){
+/* ---------- Spawn Random Emojis ---------- */
+function spawnEmojis(){
   if(!active) return;
 
-  const x = Math.random() * (window.innerWidth - 60);
-  const y = Math.random() * (window.innerHeight - 150);
+  document.querySelectorAll(".emoji").forEach(e=>e.remove());
 
-  dot.style.left = x + "px";
-  dot.style.top = y + "px";
-  dot.style.display = "block";
+  let count=5+Math.floor(Math.random()*2); // 5–6 emojis
+  let options=[target];
 
-  startTime = Date.now();
-}
-
-dot.onclick = function(){
-  if(!active) return;
-
-  const reaction = (Date.now() - startTime) / 1000;
-  times.push(reaction);
-  score++;
-
-  dot.style.display = "none";
-  setTimeout(showDot, Math.random() * 1200 + 500);
-};
-
-function endGame(){
-  active = false;
-  dot.style.display = "none";
-
-  if(score === 0){
-    document.getElementById("result").innerText =
-      "Game ended. No clicks recorded.";
-    return;
+  while(options.length<count){
+    let e=animals[Math.floor(Math.random()*animals.length)];
+    if(!options.includes(e)) options.push(e);
   }
 
-  const avg =
-    (times.reduce((a,b)=>a+b,0) / times.length).toFixed(2);
+  options.sort(()=>Math.random()-0.5);
+  startTime=Date.now();
 
-  document.getElementById("result").innerText =
-    `Game Over 🧠 | Score: ${score} | Avg Reaction Time: ${avg}s`;
+  options.forEach(e=>{
+    const el=document.createElement("div");
+    el.className="emoji";
+    el.innerText=e;
+
+    el.style.left=Math.random()*(window.innerWidth-60)+"px";
+    el.style.top=(Math.random()*(window.innerHeight-140)+80)+"px";
+
+    el.onclick=()=>selectEmoji(e);
+    document.body.appendChild(el);
+  });
+}
+
+/* ---------- Select ---------- */
+function selectEmoji(e){
+  if(!active) return;
+
+  if(e===target){
+    const t=(Date.now()-startTime)/1000;
+    times.push(t);
+    score++;
+    spawnEmojis();
+  }
+}
+
+/* ---------- End ---------- */
+function endSession(){
+  active=false;
+  document.querySelectorAll(".emoji").forEach(e=>e.remove());
+
+  let content="";
+  if(score===0){
+    content="Session ended. No interactions recorded.";
+  }else{
+    const avg=(times.reduce((a,b)=>a+b,0)/times.length).toFixed(2);
+    let msg="";
+    if(avg<0.6) msg="🚀 Amazing focus!";
+    else if(avg<1) msg="😄 Sharp attention!";
+    else if(avg<1.5) msg="🙂 Good effort!";
+    else msg="🌱 Practice improves focus!";
+
+    content=`
+      <h2>🧠 Session Complete</h2>
+      <p><strong>Score:</strong> ${score}</p>
+      <p><strong>Avg Reaction:</strong> ${avg}s</p>
+      <p style="margin-top:10px">${msg}</p>
+    `;
+  }
+
+  document.getElementById("result").innerHTML=content;
+  document.getElementById("overlay").style.display="flex";
 }
 </script>
 

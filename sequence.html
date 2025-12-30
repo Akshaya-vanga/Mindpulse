@@ -2,100 +2,177 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sequence Finder</title>
+<title>Sequence Finder | MindPulse</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{
+/* ---------- Reset ---------- */
+*{
   margin:0;
-  font-family:"Segoe UI",Arial;
-  text-align:center;
-  color:white;
-  min-height:100vh;
-  background:linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#1e3c72,#2a5298);
-  background-size:400% 400%;
-  animation:bg 14s ease infinite;
-}
-@keyframes bg{
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Segoe UI", Arial, sans-serif;
 }
 
+/* ---------- Background ---------- */
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 22% 75%, #ffefb8 0%, transparent 45%),
+    radial-gradient(circle at 82% 28%, #dff7e6 0%, transparent 45%),
+    radial-gradient(circle at 18% 32%, #d9e6ff 0%, transparent 45%),
+    radial-gradient(circle at 78% 78%, #ffd1df 0%, transparent 45%),
+    linear-gradient(135deg, #f6f7fb, #e9ecf7);
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:30px 15px;
+}
+
+/* ---------- Heading ---------- */
+h1{
+  font-size:32px;
+  margin-bottom:6px;
+  color:#2f2f55;
+}
+
+.subtitle{
+  opacity:.7;
+  margin-bottom:18px;
+}
+
+/* ---------- Info ---------- */
 #info{
   display:flex;
-  justify-content:center;
-  gap:25px;
-  margin-top:10px;
+  gap:20px;
+  margin-bottom:25px;
+  font-size:14px;
+  color:#444;
 }
 
+/* ---------- Game Container ---------- */
 #game{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:15px;
-  justify-content:center;
-  padding:25px;
-  margin:25px auto;
-  background:rgba(255,255,255,.08);
-  border-radius:20px;
-  backdrop-filter:blur(12px);
-  box-shadow:0 15px 40px rgba(0,0,0,.4);
-  max-width:360px;
-  perspective:900px;
+  gap:18px;
+
+  padding:30px;
+  background:rgba(255,255,255,.45);
+  border-radius:26px;
+  backdrop-filter:blur(16px);
+
+  box-shadow:0 22px 50px rgba(0,0,0,.18);
 }
 
-/* REAL CARD FEEL */
+/* ---------- Cards (Interesting Pastel Glass) ---------- */
 .card{
-  width:clamp(65px,22vw,95px);
-  height:clamp(65px,22vw,95px);
-  font-size:clamp(22px,6vw,32px);
-  font-weight:600;
-
-  background:linear-gradient(145deg,#3b4252,#1e293b);
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.18);
+  width:clamp(70px,22vw,95px);
+  height:clamp(70px,22vw,95px);
 
   display:flex;
   align-items:center;
   justify-content:center;
 
+  font-size:clamp(22px,6vw,30px);
+  font-weight:600;
+
+  border-radius:20px;
   cursor:pointer;
+  position:relative;
+  overflow:hidden;
+
+  background:linear-gradient(145deg,#f8faff,#eef2ff);
+  border:1px solid rgba(255,255,255,.65);
+
+  color:#2f2f55;
 
   box-shadow:
-    0 6px 12px rgba(0,0,0,.35),
-    inset 0 1px 0 rgba(255,255,255,.15);
+    0 10px 25px rgba(0,0,0,.15),
+    inset 0 2px 4px rgba(255,255,255,.8);
 
-  transition:transform .25s, box-shadow .25s, background .25s;
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    background .25s ease;
 }
 
+/* subtle shine */
+.card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,.7),
+    transparent
+  );
+  opacity:.5;
+  transform:translateX(-120%);
+  transition:transform .6s ease;
+}
+
+.card:hover::before{
+  transform:translateX(120%);
+}
+
+/* hover motion */
 .card:hover{
-  transform:translateY(-6px) scale(1.05);
+  transform:translateY(-8px) scale(1.07) rotate(-1deg);
+  box-shadow:0 22px 45px rgba(0,0,0,.25);
 }
 
-.card.open{background:linear-gradient(145deg,#22c55e,#16a34a);}
-.card.wrong{background:linear-gradient(145deg,#ef4444,#b91c1c);}
+/* ---------- Correct ---------- */
+.card.open{
+  background:linear-gradient(145deg,#d1fae5,#a7f3d0);
+  color:#065f46;
+  box-shadow:
+    0 15px 30px rgba(16,185,129,.45),
+    inset 0 2px 6px rgba(255,255,255,.8);
+}
 
+/* ---------- Wrong ---------- */
+.card.wrong{
+  background:linear-gradient(145deg,#fecaca,#fca5a5);
+  color:#7f1d1d;
+  box-shadow:
+    0 15px 30px rgba(239,68,68,.45);
+}
+
+/* ---------- Overlay ---------- */
 #overlay{
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.6);
+  background:rgba(0,0,0,.45);
   backdrop-filter:blur(6px);
+
   align-items:center;
   justify-content:center;
 }
 
 #result{
-  background:rgba(255,255,255,.15);
+  background:rgba(255,255,255,.92);
   padding:30px;
-  border-radius:20px;
+  border-radius:22px;
+  text-align:center;
+  box-shadow:0 25px 45px rgba(0,0,0,.3);
 }
 
 button{
-  padding:10px 22px;
+  margin-top:15px;
+  padding:10px 24px;
   border:none;
-  border-radius:8px;
+  border-radius:22px;
   cursor:pointer;
+  background:linear-gradient(135deg,#6366f1,#a855f7);
+  color:#fff;
+}
+
+/* ---------- Mobile ---------- */
+@media(max-width:600px){
+  h1{font-size:26px;}
 }
 </style>
 </head>
@@ -103,7 +180,7 @@ button{
 <body>
 
 <h1>🔢 Sequence Finder</h1>
-<p>Memorize • Focus • Recall</p>
+<p class="subtitle">Memorize • Focus • Recall</p>
 
 <div id="info">
   <div id="progress">Memorize...</div>
@@ -125,11 +202,11 @@ button{
 let nums=[],expected=1,time=0,timer,lock=true;
 
 function comment(t){
-  if(t<=10) return "🚀 Speedrun vibes!";
-  if(t<=18) return "😎 Smooth and focused.";
-  if(t<=30) return "🙂 Brain warmed up nicely.";
-  if(t<=45) return "🤔 Thinking mode activated.";
-  return "😂 Brain took the scenic route.";
+  if(t<=10) return "🚀 Excellent focus!";
+  if(t<=18) return "😎 Sharp mind!";
+  if(t<=30) return "🙂 Good effort!";
+  if(t<=45) return "🤔 Needs focus";
+  return "😂 Brain warming up!";
 }
 
 function start(){
@@ -143,8 +220,13 @@ function start(){
   let c=3;
   const m=setInterval(()=>{
     document.getElementById("progress").innerText=`Memorize... ${c--}`;
-    if(c<0){clearInterval(m); hide(); startTimer(); lock=false;
-      document.getElementById("progress").innerText="Find: 1 / 9";}
+    if(c<0){
+      clearInterval(m);
+      hide();
+      startTimer();
+      lock=false;
+      document.getElementById("progress").innerText="Find: 1 / 9";
+    }
   },1000);
 }
 
@@ -187,7 +269,7 @@ function click(card){
       document.getElementById("comment").innerText=comment(time);
       document.getElementById("overlay").style.display="flex";
     }
-  } else {
+  }else{
     lock=true;
     card.classList.add("wrong");
     setTimeout(()=>{

@@ -2,87 +2,136 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Memory Flip</title>
+<title>Memory Flip | MindPulse</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* 🌈 Background */
-body {
-  margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
-  color: white;
-  text-align: center;
-  min-height: 100vh;
-  background: linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#1e3c72,#2a5298);
-  background-size: 400% 400%;
-  animation: bg 14s ease infinite;
-}
-@keyframes bg {
-  0% {background-position:0% 50%}
-  50% {background-position:100% 50%}
-  100% {background-position:0% 50%}
+/* ---------- Reset ---------- */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Segoe UI", Arial, sans-serif;
 }
 
-h1 { margin-top: 20px; }
+/* ---------- Pastel Background ---------- */
+body{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:25px 15px;
 
-/* 🧊 Board */
-#game {
-  display: grid;
-  gap: 14px;
-  justify-content: center;
-  padding: 25px;
-  margin: 20px auto;
-  background: rgba(255,255,255,0.08);
-  border-radius: 20px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-  perspective: 900px;
+  background:
+    radial-gradient(circle at 20% 30%, #ffd6e0 0%, transparent 45%),
+    radial-gradient(circle at 80% 70%, #d0f0fd 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, #ede9fe 0%, transparent 45%),
+    linear-gradient(135deg,#f8fafc,#eef2ff);
+
+  color:#2f2f55;
 }
 
-/* 🃏 REAL CARD FEEL */
-.card {
-  width: clamp(60px, 18vw, 90px);
-  height: clamp(60px, 18vw, 90px);
-  font-size: clamp(20px, 5vw, 30px);
-  font-weight: 600;
+/* ---------- Heading ---------- */
+h1{
+  font-size:32px;
+  margin-bottom:6px;
+}
 
-  background: linear-gradient(145deg,#3b4252,#1e293b);
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.18);
+#levelText{
+  opacity:.7;
+  margin-bottom:22px;
+}
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* ---------- Game Board ---------- */
+#game{
+  display:grid;
+  gap:16px;
+  padding:30px;
+  background:rgba(255,255,255,.55);
+  border-radius:26px;
+  backdrop-filter:blur(14px);
+  box-shadow:0 22px 45px rgba(0,0,0,.18);
+  justify-content:center;
+}
 
-  cursor: pointer;
+/* ---------- Cards ---------- */
+.card{
+  width:clamp(68px,18vw,90px);
+  height:clamp(68px,18vw,90px);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:clamp(22px,5vw,30px);
+  font-weight:600;
+
+  border-radius:18px;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+
+  background:linear-gradient(145deg,#f8faff,#eef2ff);
+  border:1px solid rgba(255,255,255,.6);
+  color:#2f2f55;
 
   box-shadow:
-    0 6px 12px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.15);
+    0 10px 22px rgba(0,0,0,.15),
+    inset 0 2px 4px rgba(255,255,255,.8);
 
-  transition: transform .25s, box-shadow .25s, background .25s;
+  transition:all .25s ease;
 }
 
-.card:hover {
-  transform: translateY(-6px) scale(1.05);
-  box-shadow:
-    0 14px 28px rgba(0,0,0,0.45),
-    inset 0 1px 0 rgba(255,255,255,0.2);
+/* Shine animation */
+.card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,.75),
+    transparent
+  );
+  transform:translateX(-120%);
+  transition:transform .6s ease;
 }
 
+.card:hover::before{
+  transform:translateX(120%);
+}
+
+.card:hover{
+  transform:translateY(-6px) scale(1.06);
+  box-shadow:0 22px 40px rgba(0,0,0,.22);
+}
+
+/* Flipped / matched */
 .card.flipped,
-.card.matched {
-  background: linear-gradient(145deg,#22c55e,#16a34a);
+.card.matched{
+  background:linear-gradient(145deg,#bbf7d0,#86efac);
+  color:#065f46;
 }
 
-button {
-  padding: 10px 20px;
-  margin: 8px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+/* ---------- Controls ---------- */
+#controls{
+  margin-top:22px;
 }
 
+button{
+  padding:10px 22px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  background:linear-gradient(135deg,#6366f1,#a855f7);
+  color:#fff;
+  margin:6px;
+}
+
+/* ---------- Mobile ---------- */
+@media(max-width:600px){
+  h1{font-size:26px;}
+}
 </style>
 </head>
 
@@ -116,9 +165,13 @@ function startGame(){
   const {r,c}=levels[level];
   const pairs=(r*c)/2;
 
-  matched=0; first=null; lock=false;
+  matched=0;
+  first=null;
+  lock=false;
+
   document.getElementById("controls").style.display="none";
-  document.getElementById("levelText").innerText=`Level ${level} (${r}×${c})`;
+  document.getElementById("levelText").innerText =
+    `Level ${level} (${r} × ${c})`;
 
   let pool=[...symbols].sort(()=>Math.random()-0.5);
   let values=[];
@@ -145,28 +198,52 @@ function flip(card){
   card.classList.add("flipped");
   card.innerText=card.dataset.value;
 
-  if(!first){ first=card; return; }
+  if(!first){
+    first=card;
+    return;
+  }
 
   if(first.dataset.value===card.dataset.value){
     first.classList.add("matched");
     card.classList.add("matched");
     matched+=2;
     first=null;
-    if(matched===document.querySelectorAll(".card").length)
+
+    if(matched===document.querySelectorAll(".card").length){
       document.getElementById("controls").style.display="block";
+
+      // If last level, change button text
+      if(level === 3){
+        document.querySelector("#controls button:last-child")
+          .innerText = "🎉 Completed";
+      }
+    }
   } else {
     lock=true;
     setTimeout(()=>{
       first.classList.remove("flipped");
       card.classList.remove("flipped");
-      first.innerText="?"; card.innerText="?";
-      first=null; lock=false;
+      first.innerText="?";
+      card.innerText="?";
+      first=null;
+      lock=false;
     },700);
   }
 }
 
-function restart(){ startGame(); }
-function nextLevel(){ level=level<3?level+1:1; startGame(); }
+function restart(){
+  startGame();
+}
+
+function nextLevel(){
+  if(level < 3){
+    level++;
+    startGame();
+  } else {
+    document.getElementById("controls").innerHTML =
+      "<p>🎉 All levels completed! Great job!</p>";
+  }
+}
 
 startGame();
 </script>
