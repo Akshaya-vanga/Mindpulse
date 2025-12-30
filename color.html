@@ -6,55 +6,72 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+/* ---------- RESET ---------- */
 *{
   box-sizing:border-box;
-  font-family: "Segoe UI", sans-serif;
+  font-family:"Segoe UI", sans-serif;
 }
 
+/* ---------- BODY (PASTEL + COLOR PSYCHOLOGY) ---------- */
 body{
   margin:0;
   min-height:100vh;
-  background: linear-gradient(135deg,#667eea,#764ba2);
+  background:
+  radial-gradient(circle at 22% 75%, #ffefb8 0%, transparent 45%),
+  radial-gradient(circle at 82% 28%, #dff7e6 0%, transparent 45%),
+  radial-gradient(circle at 18% 32%, #d9e6ff 0%, transparent 45%),
+  radial-gradient(circle at 78% 78%, #ffd1df 0%, transparent 45%),
+  linear-gradient(135deg, #f6f7fb, #e9ecf7);
+
   display:flex;
   justify-content:center;
   align-items:center;
   color:#333;
 }
 
+/* ---------- MAIN CONTAINER (GLASS + PASTEL) ---------- */
 .container{
-  background:#ffffffee;
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(14px);
   width:95%;
   max-width:900px;
-  border-radius:18px;
-  padding:25px;
-  box-shadow:0 20px 40px rgba(0,0,0,0.2);
-  animation:fadeIn .6s ease;
+  border-radius:26px;
+  padding:30px;
+  box-shadow:0 25px 60px rgba(0,0,0,0.15);
+  animation:fadeIn .7s ease;
 }
 
+/* ---------- HEADINGS ---------- */
 h1{
   text-align:center;
-  margin-bottom:10px;
+  margin-bottom:6px;
+  color:#2f2f55;
 }
 
+/* ---------- QUESTION ---------- */
 .question{
   text-align:center;
   font-size:18px;
-  margin:20px 0;
+  margin:22px 0;
 }
 
+/* ---------- OPTIONS GRID ---------- */
 .options{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:15px;
+  gap:18px;
 }
 
+/* ---------- OPTION CARD ---------- */
 .option{
-  border-radius:14px;
+  border-radius:16px;
   overflow:hidden;
   cursor:pointer;
   border:3px solid transparent;
-  transition:.3s;
-  background:#f9f9f9;
+  transition:.35s ease;
+  background:#ffffff;
+  position:relative;
+  box-shadow:0 10px 22px rgba(0,0,0,0.12);
 }
 
 .option img{
@@ -63,28 +80,54 @@ h1{
   object-fit:cover;
 }
 
+/* soft pastel shine */
+.option::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    135deg,
+    rgba(255,255,255,0.45),
+    transparent
+  );
+  opacity:0;
+  transition:.3s;
+}
+
 .option:hover{
-  transform:translateY(-5px);
+  transform:translateY(-6px) scale(1.02);
 }
 
+.option:hover::after{
+  opacity:1;
+}
+
+/* ---------- SELECTED OPTION ---------- */
 .option.selected{
-  border-color:#667eea;
+  border-color:#b7b9ff;
+  box-shadow:0 0 0 4px rgba(183,185,255,0.35);
 }
 
+/* ---------- NAVIGATION ---------- */
 .nav{
   display:flex;
   justify-content:space-between;
-  margin-top:20px;
+  margin-top:25px;
 }
 
 button{
-  padding:10px 22px;
+  padding:10px 26px;
   border:none;
-  border-radius:10px;
-  background:#667eea;
-  color:#fff;
-  cursor:pointer;
+  border-radius:12px;
+  background:#b7b9ff;
+  color:#2f2f55;
   font-size:15px;
+  cursor:pointer;
+  transition:.3s;
+}
+
+button:hover{
+  background:#a3a6ff;
 }
 
 button:disabled{
@@ -92,20 +135,29 @@ button:disabled{
   cursor:not-allowed;
 }
 
+/* ---------- RESULT ---------- */
 .result{
   text-align:center;
   animation:fadeIn .6s ease;
 }
 
 .result h2{
-  margin-bottom:10px;
+  margin-bottom:12px;
+  color:#2f2f55;
 }
 
+.result p{
+  font-size:16px;
+  line-height:1.6;
+}
+
+/* ---------- ANIMATION ---------- */
 @keyframes fadeIn{
-  from{opacity:0;transform:translateY(20px);}
-  to{opacity:1;transform:translateY(0);}
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
 }
 </style>
+
 </head>
 
 <body>
