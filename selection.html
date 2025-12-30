@@ -15,151 +15,221 @@
     }
 
     body {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
+  min-height: 100vh;
+  background: #fdfbfb;
+  background-image: 
+    radial-gradient(circle at 20% 30%, #ffd6e0 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, #d0f0fd 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, #f8e0ff 0%, transparent 50%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow-x: hidden;
+}
+
+
+    /* ---------- Floating Shapes ---------- */
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: float 6s ease-in-out infinite;
+      z-index: 0;
+    }
+    .shape1 { width: 150px; height: 150px; background: #ffd6e0; top: 10%; left: 5%; }
+    .shape2 { width: 200px; height: 200px; background: #d0f0fd; top: 60%; left: 80%; animation-duration: 8s; }
+    .shape3 { width: 100px; height: 100px; background: #f8e0ff; top: 40%; left: 40%; animation-duration: 7s; }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
     }
 
-    /* ---------- Page ---------- */
+    /* ---------- Main Glass Container ---------- */
     .page {
       width: 100%;
-      max-width: 900px;
-      padding: 40px 20px;
-      animation: fadeIn 0.7s ease;
+      max-width: 1000px;
+      padding: 50px 30px;
+      margin-top: 40px;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(14px);
+      border-radius: 28px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+      animation: fadeIn 0.8s ease;
+      position: relative;
+      z-index: 1;
     }
 
     h1 {
       text-align: center;
-      color: #fff;
+      font-size: 36px;
+      color: #2f2f55;
       margin-bottom: 10px;
-      font-size: 32px;
     }
 
     .subtitle {
       text-align: center;
-      color: #e0e0ff;
-      margin-bottom: 40px;
       font-size: 16px;
+      color: #555;
+      margin-bottom: 45px;
     }
 
     /* ---------- Grid ---------- */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 25px;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 30px;
     }
 
-    /* ---------- Card ---------- */
+    /* ---------- Cards ---------- */
     .card {
       background: rgba(255, 255, 255, 0.95);
-      border-radius: 16px;
-      padding: 30px 20px;
+      border-radius: 20px;
+      padding: 35px 25px;
       text-align: center;
       cursor: pointer;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: all 0.35s ease;
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        120deg,
+        rgba(215, 236, 255, 0.6),
+        rgba(231, 217, 255, 0.6),
+        rgba(255, 232, 214, 0.6)
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover::before {
+      opacity: 1;
     }
 
     .card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 25px 45px rgba(0,0,0,0.2);
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.18);
     }
 
     .card img {
       width: 70px;
       height: 70px;
-      margin-bottom: 15px;
+      margin-bottom: 18px;
+      z-index: 1;
+      position: relative;
       transition: transform 0.3s ease;
     }
 
     .card:hover img {
-      transform: scale(1.1);
+      transform: scale(1.12);
     }
 
     .card h3 {
+      font-size: 19px;
+      color: #2f2f55;
       margin-bottom: 10px;
-      color: #333;
-      font-size: 18px;
+      position: relative;
+      z-index: 1;
     }
 
     .card p {
-      font-size: 14px;
+      font-size: 14.5px;
       color: #555;
-      line-height: 1.5;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
     }
 
-    /* ---------- Disclaimer Footer ---------- */
+    /* ---------- Disclaimer ---------- */
     .disclaimer-footer {
-      width: 100%;
-      text-align: center;
-      padding: 14px 20px 22px;
+      max-width: 900px;
+      padding: 20px;
       font-size: 13px;
-      color: #f0f0ff;
+      color: #555;
+      text-align: center;
       opacity: 0.85;
+      position: relative;
+      z-index: 1;
     }
 
     .disclaimer-footer strong {
-      color: #ffffff;
+      color: #333;
     }
 
     /* ---------- Animations ---------- */
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 <body>
 
+  <!-- Floating Shapes -->
+  <div class="shape shape1"></div>
+  <div class="shape shape2"></div>
+  <div class="shape shape3"></div>
+
   <div class="page">
     <h1>Choose Your Analysis</h1>
     <p class="subtitle">
-      Select an option to begin your personalized assessment
+      Begin your journey of self-discovery with MindPulse
     </p>
 
     <div class="grid">
-
       <div class="card" onclick="goTo('iq.html')">
-        <img src="https://cdn-icons-png.flaticon.com/512/201/201818.png" alt="IQ Test">
+        <img src="https://cdn-icons-png.flaticon.com/512/201/201818.png">
         <h3>Test Your IQ</h3>
-        <p>Measure logical thinking and problem-solving ability.</p>
+        <p>Measure logical thinking, reasoning, and problem-solving skills.</p>
       </div>
 
       <div class="card" onclick="goTo('mood.html')">
-        <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png" alt="Mood Test">
+        <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png">
         <h3>Test Your Mood</h3>
-        <p>Understand your emotional state and stability.</p>
+        <p>Understand your emotional balance and mental state.</p>
       </div>
 
       <div class="card" onclick="goTo('personality.html')">
-        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920063.png" alt="Personality Test">
+        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920063.png">
         <h3>Test Your Personality</h3>
-        <p>Explore traits and behavioral patterns.</p>
+        <p>Explore your behavioral traits and personal tendencies.</p>
+      </div>
+
+      <div class="card" onclick="goTo('color.html')">
+        <img src="https://cdn-icons-png.flaticon.com/512/3790/3790171.png">
+        <h3>Color Psychology</h3>
+        <p>Discover what your color preferences reveal about you.</p>
       </div>
 
       <div class="card" onclick="goTo('games.html')">
-        <img src="https://cdn-icons-png.flaticon.com/512/1688/1688400.png" alt="Games">
+        <img src="https://cdn-icons-png.flaticon.com/512/1688/1688400.png">
         <h3>Play Games</h3>
-        <p>Relax and engage with simple interactive games.</p>
+        <p>Relax your mind with engaging, calming activities.</p>
       </div>
-      <div class="card" onclick="goTo('color.html')">
-  <img src="https://cdn-icons-png.flaticon.com/512/3790/3790171.png" alt="Color Psychology">
-  <h3>Color Psychology</h3>
-  <p>Discover what your color choices reveal about your mind.</p>
-</div>
     </div>
   </div>
 
-  <!-- Disclaimer Footer -->
   <footer class="disclaimer-footer">
     <p>
-      <strong>Disclaimer:</strong>
-      MindPulse analyses are intended for educational and self-reflection purposes only.
-      These assessments are not medically, psychologically, or scientifically validated
-      and should not be considered professional advice.
+      <strong>Disclaimer:</strong> MindPulse assessments are for educational and
+      self-reflection purposes only and are not a substitute for professional advice.
     </p>
   </footer>
 

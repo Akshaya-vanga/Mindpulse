@@ -5,25 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome | MindPulse</title>
 
+  <!-- Psychological Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: "Segoe UI", Arial, sans-serif;
     }
 
-   body {
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at 20% 30%, #c7d2fe, transparent 45%),
-    radial-gradient(circle at 80% 20%, #fde68a, transparent 45%),
-    radial-gradient(circle at 60% 80%, #fbcfe8, transparent 45%),
-    linear-gradient(135deg, #eef2ff, #fdf4ff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    body {
+      background-image: url("image.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Poppins", sans-serif;
+    }
 
     .page {
       width: 100%;
@@ -31,17 +34,43 @@
       justify-content: center;
     }
 
+    /* ===== CREATIVE CENTRAL CARD ===== */
     .card {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 45px 35px;
-      max-width: 440px;
+      position: relative;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+
+      padding: 48px 36px;
+      max-width: 460px;
       width: 90%;
-      border-radius: 18px;
+      border-radius: 22px;
       text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+
+      box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(255, 255, 255, 0.6);
+
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
     }
 
-    /* ===== LOGO CIRCLE ===== */
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #c3e8ff, #e8d9ff, #ffe6c9);
+      z-index: -1;
+    }
+
+    .card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow:
+        0 28px 60px rgba(0, 0, 0, 0.18),
+        0 0 25px rgba(150, 180, 255, 0.35);
+    }
+
+    /* ===== LOGO ===== */
     .logo {
       width: 160px;
       height: 160px;
@@ -52,8 +81,6 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-
-      /* 🔥 ONLY CIRCULAR PART VISIBLE */
       clip-path: circle(40% at 50% 47%);
       transform: scale(1.35);
     }
@@ -62,53 +89,103 @@
     .icon-row {
       display: flex;
       justify-content: center;
-      gap: 16px;
-      margin-bottom: 20px;
+      gap: 18px;
+      margin-bottom: 22px;
     }
 
-    .icon-row img {
-      width: 52px;
-      height: 52px;
+    .icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+
+      background: linear-gradient(135deg, #c3e8ff, #e8d9ff);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease;
     }
 
+    .icon-box:hover {
+      transform: translateY(-4px) scale(1.05);
+    }
+
+    /* ===== HEADING ===== */
     h1 {
-      font-size: 30px;
-      margin-bottom: 12px;
-      color: #222;
+      font-family: "Playfair Display", serif;
+      font-size: 34px;
+      margin-bottom: 14px;
+      color: #2b2b2b;
+      letter-spacing: 0.5px;
     }
 
+    h1::after {
+      content: "";
+      display: block;
+      width: 60px;
+      height: 4px;
+      margin: 12px auto 0;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #667eea, #a18cd1);
+    }
+
+    /* ===== DESCRIPTION ===== */
     p {
       font-size: 15px;
       color: #555;
-      line-height: 1.6;
-      margin-bottom: 30px;
+      line-height: 1.8;
+      margin: 26px 0 32px;
+
+      background: linear-gradient(
+        to right,
+        rgba(230, 245, 255, 0.7),
+        rgba(255, 240, 220, 0.7)
+      );
+      padding: 14px 16px;
+      border-radius: 12px;
     }
 
-    button {
-      padding: 14px 30px;
-      font-size: 16px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: #ffffff;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-      box-shadow: 0 8px 18px rgba(102,126,234,0.4);
-      transition: all 0.3s ease;
-    }
+    /* ===== BUTTON ===== */
+   /* ===== PASTEL START BUTTON ===== */
+button {
+  padding: 15px 34px;
+  font-size: 16px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
 
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px rgba(102,126,234,0.5);
-    }
+  background: linear-gradient(
+    135deg,
+    #e0d9ff,
+#8b82c9
+
+
+  );
+  color: #000000;
+
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+
+  box-shadow: 0 8px 20px rgba(71, 76, 124, 0.45);
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 28px rgba(103, 113, 207, 0.65);
+}
+
 
     @media (max-width: 480px) {
-      h1 { font-size: 26px; }
+      h1 { font-size: 28px; }
       p { font-size: 14px; }
       .logo {
         width: 140px;
         height: 140px;
       }
     }
+    
   </style>
 </head>
 
@@ -124,9 +201,9 @@
 
       <!-- ICONS -->
       <div class="icon-row">
-        <img src="https://cdn-icons-png.flaticon.com/512/201/201818.png" alt="IQ">
-        <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png" alt="Mood">
-        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920063.png" alt="Personality">
+        <div class="icon-box">🧠</div>
+        <div class="icon-box">💭</div>
+        <div class="icon-box">🎭</div>
       </div>
 
       <h1>Welcome to MindPulse</h1>
@@ -145,4 +222,3 @@
 
 </body>
 </html>
-
