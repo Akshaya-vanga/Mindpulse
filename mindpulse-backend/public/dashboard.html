@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your Dashboard | MindPulse</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.3/chart.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 30%, #ffd6e0 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, #d0f0fd 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, #f8e0ff 0%, transparent 50%),
+    #fdfbfb;
+  padding: 30px 16px 60px;
+}
+.wrap { max-width: 1000px; margin: 0 auto; }
+h1 { text-align: center; color: #2f2f55; font-size: 32px; margin-bottom: 6px; }
+.subtitle { text-align: center; color: #555; margin-bottom: 30px; }
+.back-link { display: inline-block; margin-bottom: 20px; color: #185a9d; text-decoration: none; font-size: 14px; }
+.empty {
+  background: rgba(255,255,255,0.9); border-radius: 18px; padding: 40px;
+  text-align: center; color: #555; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 24px; }
+.panel {
+  background: rgba(255,255,255,0.92); border-radius: 18px; padding: 22px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+.panel h3 { color: #2f2f55; margin-bottom: 12px; font-size: 17px; text-transform: capitalize; }
+.stat-row { display: flex; justify-content: space-between; font-size: 13.5px; color: #444; margin-bottom: 4px; }
+.stat-row span:last-child { font-weight: 600; color: #185a9d; }
+canvas { max-height: 160px; margin-top: 10px; }
+.insights-panel {
+  background: linear-gradient(135deg, #43cea2, #185a9d); color: #fff;
+  border-radius: 18px; padding: 24px; margin-bottom: 24px;
+}
+.insights-panel h2 { margin-bottom: 14px; font-size: 20px; }
+.corr-item { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; font-size: 14px; }
+.risk-box { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 14px; font-size: 14px; margin-top: 10px; }
+.note { opacity: 0.85; font-size: 12.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back-link" href="selection.html">← Back to tests</a>
+  <h1>Your MindPulse Dashboard</h1>
+  <p class="subtitle">Trends and patterns across everything you've taken so far</p>
+
+  <div id="insightsPanel"></div>
+  <div id="content"><p class="empty">Loading your data…</p></div>
+</div>
+
+<script>
+const uid = localStorage.getItem("mindpulse_uid");
+
+const LABEL_MAP = {
+  mood: "Mood", focus: "Focus", memory: "Memory", decision: "Decision-Making",
+  personality: "Personality", iq: "IQ", color: "Color Psychology",
+  sequence: "Sequence", games: "Games",
+};
+
+async function loadDashboard() {
+  const content = document.getElementById("content");
+  const insightsPanel = document.getElementById("insightsPanel");
+
+  if (!uid) {
+    content.innerHTML = `<p class="empty">No results yet — take a test first, then come back here to see your trends.</p>`;
+    return;
+  }
+
+  const [summaryRes, insightsRes] = await Promise.all([
+    fetch(`/api/summary/${uid}`).catch(() => null),
+    fetch(`/api/insights/${uid}`).catch(() => null),
+  ]);
+
+  const summary = summaryRes && summaryRes.ok ? await summaryRes.json() : {};
+  const insights = insightsRes && insightsRes.ok ? await insightsRes.json() : { correlations: [], risk_model: null };
+
+  const testTypes = Object.keys(summary);
+  if (testTypes.length === 0) {
+    content.innerHTML = `<p class="empty">No results yet — take a test first, then come back here to see your trends.</p>`;
+    return;
+  }
+
+  // ---- Insights panel ----
+  let insightsHtml = `<div class="insights-panel"><h2>Insights</h2>`;
+  if (insights.correlations && insights.correlations.length > 0) {
+    insights.correlations.forEach(c => {
+      const direction = c.correlation > 0 ? "move together" : "move in opposite directions";
+      insightsHtml += `<div class="corr-item">${LABEL_MAP[c.test_a] || c.test_a} and ${LABEL_MAP[c.test_b] || c.test_b} tend to ${direction}
+        (r = ${c.correlation}, based on ${c.n_pairs} paired attempts).</div>`;
+    });
+  } else {
+    insightsHtml += `<div class="corr-item">Take a few more tests across different categories to unlock correlations between them.</div>`;
+  }
+  if (insights.risk_model) {
+    if (insights.risk_model.low_mood_risk_probability !== undefined) {
+      const pct = Math.round(insights.risk_model.low_mood_risk_probability * 100);
+      insightsHtml += `<div class="risk-box"><strong>Estimated below-median mood risk: ${pct}%</strong><br>
+        <span class="note">${insights.risk_model.note}</span></div>`;
+    } else {
+      insightsHtml += `<div class="risk-box note">${insights.risk_model.note}</div>`;
+    }
+  }
+  insightsHtml += `</div>`;
+  insightsPanel.innerHTML = insightsHtml;
+
+  // ---- Per-test panels ----
+  let html = `<div class="grid">`;
+  testTypes.forEach(t => {
+    const s = summary[t];
+    html += `
+      <div class="panel">
+        <h3>${LABEL_MAP[t] || t}</h3>
+        <div class="stat-row"><span>Attempts</span><span>${s.attempts}</span></div>
+        <div class="stat-row"><span>Average score</span><span>${s.avg_score}</span></div>
+        <div class="stat-row"><span>Best score</span><span>${s.best_score}</span></div>
+        <div class="stat-row"><span>Latest</span><span>${s.latest_score} (${s.latest_label ?? "—"})</span></div>
+        <div class="stat-row"><span>Trend (first → latest)</span><span>${s.trend > 0 ? "+" : ""}${s.trend}</span></div>
+        <canvas id="chart-${t}"></canvas>
+      </div>`;
+  });
+  html += `</div>`;
+  content.innerHTML = html;
+
+  testTypes.forEach(t => {
+    const s = summary[t];
+    const ctx = document.getElementById(`chart-${t}`);
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: s.history.map((_, i) => `#${i + 1}`),
+        datasets: [{
+          label: LABEL_MAP[t] || t,
+          data: s.history.map(h => h.score),
+          borderColor: "#185a9d",
+          backgroundColor: "rgba(24,90,157,0.15)",
+          tension: 0.3,
+          fill: true,
+        }],
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } },
+      },
+    });
+  });
+}
+
+loadDashboard();
+</script>
+</body>
+</html>

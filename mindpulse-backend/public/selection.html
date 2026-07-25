@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select Analysis | MindPulse</title>
+
+  <style>
+    /* ---------- Reset ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+  min-height: 100vh;
+  background: #fdfbfb;
+  background-image: 
+    radial-gradient(circle at 20% 30%, #ffd6e0 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, #d0f0fd 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, #f8e0ff 0%, transparent 50%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow-x: hidden;
+}
+
+
+    /* ---------- Floating Shapes ---------- */
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: float 6s ease-in-out infinite;
+      z-index: 0;
+    }
+    .shape1 { width: 150px; height: 150px; background: #ffd6e0; top: 10%; left: 5%; }
+    .shape2 { width: 200px; height: 200px; background: #d0f0fd; top: 60%; left: 80%; animation-duration: 8s; }
+    .shape3 { width: 100px; height: 100px; background: #f8e0ff; top: 40%; left: 40%; animation-duration: 7s; }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+
+    /* ---------- Main Glass Container ---------- */
+    .page {
+      width: 100%;
+      max-width: 1000px;
+      padding: 50px 30px;
+      margin-top: 40px;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(14px);
+      border-radius: 28px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+      animation: fadeIn 0.8s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 36px;
+      color: #2f2f55;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 45px;
+    }
+
+    /* ---------- Grid ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 30px;
+    }
+
+    /* ---------- Cards ---------- */
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 35px 25px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.35s ease;
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        120deg,
+        rgba(215, 236, 255, 0.6),
+        rgba(231, 217, 255, 0.6),
+        rgba(255, 232, 214, 0.6)
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.18);
+    }
+
+    .card img {
+      width: 70px;
+      height: 70px;
+      margin-bottom: 18px;
+      z-index: 1;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover img {
+      transform: scale(1.12);
+    }
+
+    .card h3 {
+      font-size: 19px;
+      color: #2f2f55;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card p {
+      font-size: 14.5px;
+      color: #555;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card.dashboard-card {
+      background: linear-gradient(135deg, #43cea2, #185a9d);
+    }
+
+    .card.dashboard-card h3, .card.dashboard-card p {
+      color: #fff;
+    }
+
+    /* ---------- Disclaimer ---------- */
+    .disclaimer-footer {
+      max-width: 900px;
+      padding: 20px;
+      font-size: 13px;
+      color: #555;
+      text-align: center;
+      opacity: 0.85;
+      position: relative;
+      z-index: 1;
+    }
+
+    .disclaimer-footer strong {
+      color: #333;
+    }
+
+    /* ---------- Animations ---------- */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Shapes -->
+  <div class="shape shape1"></div>
+  <div class="shape shape2"></div>
+  <div class="shape shape3"></div>
+
+  <div class="page">
+    <h1>Choose Your Analysis</h1>
+    <p class="subtitle">
+      Begin your journey of self-discovery with MindPulse
+    </p>
+
+    <div class="grid">
+      <div class="card" onclick="goTo('iq.html')">
+        <img src="https://cdn-icons-png.flaticon.com/512/201/201818.png">
+        <h3>Test Your IQ</h3>
+        <p>Measure logical thinking, reasoning, and problem-solving skills.</p>
+      </div>
+
+      <div class="card" onclick="goTo('mood.html')">
+        <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png">
+        <h3>Test Your Mood</h3>
+        <p>Understand your emotional balance and mental state.</p>
+      </div>
+
+      <div class="card" onclick="goTo('personality.html')">
+        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920063.png">
+        <h3>Test Your Personality</h3>
+        <p>Explore your behavioral traits and personal tendencies.</p>
+      </div>
+
+      <div class="card" onclick="goTo('color.html')">
+       <img src="https://img.icons8.com/3d-fluency/94/color-palette.png" alt="Color Psychology">
+        <h3>Color Psychology</h3>
+        <p>Discover what your color preferences reveal about you.</p>
+      </div>
+
+      <div class="card" onclick="goTo('games.html')">
+        <img src="https://cdn-icons-png.flaticon.com/512/1688/1688400.png">
+        <h3>Play Games</h3>
+        <p>Relax your mind with engaging, calming activities.</p>
+      </div>
+
+      <div class="card dashboard-card" onclick="goTo('dashboard.html')">
+        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828817.png">
+        <h3>Your Dashboard</h3>
+        <p>See trends across all your past tests in one place.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="disclaimer-footer">
+    <p>
+      <strong>Disclaimer:</strong> MindPulse assessments are for educational and
+      self-reflection purposes only and are not a substitute for professional advice.
+    </p>
+  </footer>
+
+  <script>
+    function goTo(page) {
+      window.location.href = page;
+    }
+  </script>
+
+</body>
+</html>
